@@ -18,7 +18,7 @@ app.use("/api/invoices", invoiceRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/payments", paymentRoutes);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
