@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+    url      = "file:./dev.db"
+
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  password      String
+  businessName  String?
+  address       String?
+  gstin         String?
+
+  clients       Client[]
+  invoices      Invoice[]
+
+  createdAt     DateTime @default(now())
+}
+
+model Client {
+  id        Int     @id @default(autoincrement())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+
+  userId    Int
+  user      User @relation(fields: [userId], references: [id])
+
+  invoices  Invoice[]
+
+  createdAt DateTime @default(now())
+}
+
+
+
+model Invoice {
+  id            Int       @id @default(autoincrement())
+  invoiceNumber String
+  issueDate     DateTime
+  dueDate       DateTime
+  status        String
+
+  totalAmount   Float
+  taxAmount     Float
+
+  userId        Int
+  clientId      Int
+
+  user          User   @relation(fields: [userId], references: [id])
+  client        Client @relation(fields: [clientId], references: [id])
+
+  items         InvoiceItem[]
+  payments      Payment[]
+
+  createdAt     DateTime @default(now())
+}
+
+model InvoiceItem {
+  id          Int     @id @default(autoincrement())
+  description String
+  quantity    Int
+  price       Float
+  taxPercent  Float
+
+  invoiceId   Int
+  invoice     Invoice @relation(fields: [invoiceId], references: [id])
+}
+
+model Payment {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  paymentDate DateTime
+  method      String
+
+  invoiceId   Int
+  invoice     Invoice @relation(fields: [invoiceId], references: [id])
+
+  createdAt   DateTime @default(now())
+}
