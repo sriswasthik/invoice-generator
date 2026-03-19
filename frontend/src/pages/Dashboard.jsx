@@ -81,7 +81,7 @@ const calculateStats = () => {
 
 const stats = calculateStats();
 const filteredInvoices = invoices.filter((inv) => {
-
+// 
   const matchesSearch =
     inv.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
     inv.client.name.toLowerCase().includes(search.toLowerCase());
