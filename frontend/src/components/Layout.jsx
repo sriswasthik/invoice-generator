@@ -39,9 +39,11 @@ function Layout({ page, setPage, children }) {
           </div>
 
           <button
-            style={{ marginTop: "20px", background: "#ef4444" }}
+            style={styles.logoutBtn}
             onClick={() => {
+
               localStorage.removeItem("token");
+
               window.location.reload();
             }}
           >
@@ -135,6 +137,10 @@ const styles = {
     animation: "fadeIn 0.3s ease"
   },
 
+  logoutBtn: {
+    marginTop: "20px",
+    background: "#ef4444"
+  }
 
 
 };

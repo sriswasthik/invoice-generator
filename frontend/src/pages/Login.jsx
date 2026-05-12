@@ -3,83 +3,99 @@ import api from "../api/api";
 
 function Login({ setPage }) {
 
-  const [form, setForm] = useState({
-    email: "",
-    password: ""
-  });
-
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
+    const [form, setForm] = useState({
+        email: "",
+        password: ""
     });
-  };
 
-  const login = async () => {
-    try {
-      const res = await api.post("/auth/login", form);
+    const handleChange = (e) => {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        });
+    };
 
-      localStorage.setItem("token", res.data.token);
+    const login = async () => {
 
-      // attach token globally
-      api.defaults.headers.common["Authorization"] = res.data.token;
+        try {
 
-      alert("Login successful");
+            const res = await api.post("/auth/login", form);
 
-      setPage("dashboard");
+            localStorage.setItem("token", res.data.token);
 
-    } catch (err) {
-      alert("Login failed");
-    }
-  };
+            api.defaults.headers.common["Authorization"] =
+                res.data.token;
 
-  return (
-    <div style={styles.container}>
+            window.location.reload();
 
-      <div style={styles.card}>
-        <h2>Login</h2>
+        } catch (err) {
 
-        <input
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-        />
+            alert(
+                err.response?.data?.error || "Login failed"
+            );
+        }
+    };
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
+    return (
+        <div style={styles.container}>
 
-        <button onClick={login}>
-          Login
-        </button>
+            <div style={styles.card}>
+                <h2>Login</h2>
 
-      </div>
+                <input
+                    name="email"
+                    placeholder="Email"
+                    onChange={handleChange}
+                />
 
-    </div>
-  );
+                <input
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    onChange={handleChange}
+                />
+
+                <button onClick={login}>
+                    Login
+                </button>
+
+                <p
+                    style={styles.link}
+                    onClick={() => setAuthPage("signup")}
+                >
+                    Create new account
+                </p>
+
+            </div>
+
+        </div>
+    );
 }
 
 const styles = {
-  container: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#f8fafc"
-  },
+    container: {
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#f8fafc"
+    },
 
-  card: {
-    background: "white",
-    padding: "30px",
-    borderRadius: "12px",
-    width: "300px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px"
-  }
+    link: {
+        color: "#4f46e5",
+        cursor: "pointer",
+        fontSize: "14px"
+    },
+
+    card: {
+        background: "white",
+        padding: "30px",
+        borderRadius: "12px",
+        width: "300px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px"
+    }
 };
 
 export default Login;

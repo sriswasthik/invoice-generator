@@ -5,7 +5,10 @@ import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import CreateInvoice from "./pages/CreateInvoice";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 function App() {
+
+  const [authPage, setAuthPage] = useState("login");
 
   const [page, setPage] = useState("dashboard");
 
