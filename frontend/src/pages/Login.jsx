@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../api/api";
 
-function Login({ setPage }) {
+function Login({ setAuthPage }) {
 
     const [form, setForm] = useState({
         email: "",
@@ -84,7 +84,8 @@ const styles = {
     link: {
         color: "#4f46e5",
         cursor: "pointer",
-        fontSize: "14px"
+        fontSize: "14px",
+        marginTop: "10px"
     },
 
     card: {
