@@ -4,11 +4,16 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import CreateInvoice from "./pages/CreateInvoice";
-
+import Login from "./pages/Login";
 function App() {
 
   const [page, setPage] = useState("dashboard");
 
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return <Login setPage={setPage} />;
+  }
   const renderPage = () => {
 
     if (page === "dashboard") return <Dashboard />;
@@ -18,10 +23,14 @@ function App() {
   };
 
   return (
-
     <Layout page={page} setPage={setPage}>
-      {renderPage()}
+      {page === "dashboard" && <Dashboard />}
+      {page === "clients" && <Clients />}
+      {page === "create" && <CreateInvoice />}
     </Layout>
+    // <Layout page={page} setPage={setPage}>
+    //   {renderPage()}
+    // </Layout>
 
   );
 }

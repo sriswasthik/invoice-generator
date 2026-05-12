@@ -38,6 +38,16 @@ function Layout({ page, setPage, children }) {
             Create Invoice
           </div>
 
+          <button
+            style={{ marginTop: "20px", background: "#ef4444" }}
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.reload();
+            }}
+          >
+            Logout
+          </button>
+
         </nav>
       </aside>
 
@@ -48,10 +58,10 @@ function Layout({ page, setPage, children }) {
         </div>
 
         <div style={styles.content}>
-  <div key={page} style={styles.page}>
-    {children}
-  </div>
-</div>
+          <div key={page} style={styles.page}>
+            {children}
+          </div>
+        </div>
 
       </main>
 
@@ -96,34 +106,34 @@ const styles = {
   },
 
   content: {
-  padding: "30px 20px",
-  width: "100%",
-  maxWidth: "100%",   // IMPORTANT
-},
+    padding: "30px 20px",
+    width: "100%",
+    maxWidth: "100%",   // IMPORTANT
+  },
 
   nav: {
-  display: "flex",
-  flexDirection: "column",
-  gap: "6px"
-},
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px"
+  },
 
-navItem: {
-  padding: "10px 12px",
-  borderRadius: "6px",
-  color: "#cbd5f5",
-  cursor: "pointer",
-  fontSize: "14px"
-},
+  navItem: {
+    padding: "10px 12px",
+    borderRadius: "6px",
+    color: "#cbd5f5",
+    cursor: "pointer",
+    fontSize: "14px"
+  },
 
-activeItem: {
-  background: "#1e293b",
-  color: "white",
-  fontWeight: "500"
-},
+  activeItem: {
+    background: "#1e293b",
+    color: "white",
+    fontWeight: "500"
+  },
 
-page: {
-  animation: "fadeIn 0.3s ease"
-},
+  page: {
+    animation: "fadeIn 0.3s ease"
+  },
 
 
 
