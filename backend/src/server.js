@@ -4,22 +4,23 @@ const cors = require("cors");
 const invoiceRoutes = require("./routes/invoiceRoutes");
 const clientRoutes = require("./routes/clientRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
-
-const app = express();
 const authRoutes = require("./routes/authRoutes");
 
-app.use("/api/auth", authRoutes);
+const app = express();
 
+// middleware
 app.use(cors());
 app.use(express.json());
+
+// routes
+app.use("/api/auth", authRoutes);
+app.use("/api/invoices", invoiceRoutes);
+app.use("/api/clients", clientRoutes);
+app.use("/api/payments", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.send("Invoice Platform API Running");
 });
-
-app.use("/api/invoices", invoiceRoutes);
-app.use("/api/clients", clientRoutes);
-app.use("/api/payments", paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
