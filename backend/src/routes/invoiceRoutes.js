@@ -61,6 +61,7 @@
 
 const express = require("express");
 const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
 
 const {
   createInvoice,
@@ -71,8 +72,11 @@ const {
 
 router.post("/", createInvoice);
 
-router.get("/details/:invoiceId", getInvoiceDetails);
-router.get("/:invoiceId/pdf", downloadInvoicePDF);
-router.get("/:userId", getInvoicesByUser);
-
+// router.get("/details/:invoiceId", getInvoiceDetails);
+// router.get("/:invoiceId/pdf", downloadInvoicePDF);
+// router.get("/:userId", getInvoicesByUser);
+router.post("/", authMiddleware, createInvoice);
+router.get("/", authMiddleware, getInvoices);
+router.get("/:id", authMiddleware, getInvoiceById);
+router.get("/:id/pdf", authMiddleware, downloadInvoicePDF);
 module.exports = router;

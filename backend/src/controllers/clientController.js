@@ -2,7 +2,16 @@ const prisma = require("../utils/prisma");
 
 async function createClient(req, res) {
   try {
-    const { name, email, phone, address, userId } = req.body;
+    // const { name, email, phone, address, userId } = req.body;
+    const client = await prisma.client.create({
+      data: {
+        name,
+        email,
+        phone,
+        address,
+        userId: req.userId
+      }
+    });
 
     if (!name || !userId) {
       return res.status(400).json({ error: "Name and userId are required" });
@@ -24,9 +33,9 @@ async function createClient(req, res) {
     console.error(error);
     // res.status(500).json({ error: "Failed to create client" });
     res.status(500).json({
-  error: "Failed to create client",
-  details: error.message
-});
+      error: "Failed to create client",
+      details: error.message
+    });
   }
 }
 
@@ -34,28 +43,33 @@ async function getClientsByUser(req, res) {
   try {
     const { userId } = req.params;
 
+    // const clients = await prisma.client.findMany({
+    //   where: {
+    //     userId: Number(userId)
+    //   },
+    //   orderBy: {
+    //     id: "desc"
+    //   }
+    // });
     const clients = await prisma.client.findMany({
       where: {
-        userId: Number(userId)
-      },
-      orderBy: {
-        id: "desc"
+        userId: req.userId
       }
     });
 
     res.json(clients);
 
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Failed to fetch clients" });
-//   }
-} catch (error) {
-  console.error(error);
-  res.status(500).json({
-    error: "Failed to create client",
-    details: error.message
-  });
-}
+    //   } catch (error) {
+    //     console.error(error);
+    //     res.status(500).json({ error: "Failed to fetch clients" });
+    //   }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Failed to create client",
+      details: error.message
+    });
+  }
 
 }
 

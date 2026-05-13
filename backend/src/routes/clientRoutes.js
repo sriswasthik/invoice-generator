@@ -13,9 +13,11 @@ const router = express.Router();
 const { createClient, getClientsByUser, deleteClient } = require("../controllers/clientController");
 
 const clientController = require("../controllers/clientController");
+const authMiddleware = require("../middleware/authMiddleware");
 
-router.post("/", clientController.createClient);
-router.get("/:userId", clientController.getClientsByUser);
-router.delete("/:id", deleteClient);
+// router.post("/", clientController.createClient);
+router.post("/", authMiddleware, createClient);
+router.get("/:userId", authMiddleware, getClientsByUser);
+router.delete("/:id", authMiddleware, deleteClient);
 
 module.exports = router;

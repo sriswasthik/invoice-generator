@@ -14,6 +14,7 @@ async function createInvoice(req, res) {
 
     const invoice = await prisma.invoice.create({
       data: {
+        userId: req.userId, // Use authenticated user ID
         invoiceNumber,
         issueDate: new Date(issueDate),
         dueDate: new Date(dueDate),
@@ -39,7 +40,7 @@ async function getInvoicesByUser(req, res) {
 
     const invoices = await prisma.invoice.findMany({
       where: {
-        userId: Number(userId)
+        userId: req.userId // Use authenticated user ID
       },
       include: {
         client: true
