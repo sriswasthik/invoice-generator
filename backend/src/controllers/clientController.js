@@ -43,19 +43,19 @@ async function getClientsByUser(req, res) {
   try {
     const { userId } = req.params;
 
-    // const clients = await prisma.client.findMany({
-    //   where: {
-    //     userId: Number(userId)
-    //   },
-    //   orderBy: {
-    //     id: "desc"
-    //   }
-    // });
     const clients = await prisma.client.findMany({
       where: {
         userId: req.userId
+      },
+      orderBy: {
+        id: "desc"
       }
     });
+    // const clients = await prisma.client.findMany({
+    //   where: {
+    //     userId: req.userId
+    //   }
+    // });
 
     res.json(clients);
 

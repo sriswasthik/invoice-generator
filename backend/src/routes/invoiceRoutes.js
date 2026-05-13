@@ -72,9 +72,6 @@ const {
 
 router.post("/", createInvoice);
 
-// router.get("/details/:invoiceId", getInvoiceDetails);
-// router.get("/:invoiceId/pdf", downloadInvoicePDF);
-// router.get("/:userId", getInvoicesByUser);
 router.post("/", authMiddleware, createInvoice);
 router.get("/", authMiddleware, getInvoices);
 router.get("/:id", authMiddleware, getInvoiceById);

@@ -15,7 +15,6 @@ const { createClient, getClientsByUser, deleteClient } = require("../controllers
 const clientController = require("../controllers/clientController");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// router.post("/", clientController.createClient);
 router.post("/", authMiddleware, createClient);
 router.get("/:userId", authMiddleware, getClientsByUser);
 router.delete("/:id", authMiddleware, deleteClient);
