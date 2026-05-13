@@ -70,7 +70,7 @@ const {
   downloadInvoicePDF
 } = require("../controllers/invoiceController");
 
-router.post("/", createInvoice);
+// router.post("/", createInvoice);
 
 router.post("/", authMiddleware, createInvoice);
 router.get("/", authMiddleware, getInvoices);

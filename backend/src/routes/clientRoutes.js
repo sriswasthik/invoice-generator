@@ -1,12 +1,4 @@
-// import { Router } from "express";
-// const router = Router();
-
-// import { createClient, getClientsByUser } from "../controllers/clientController";
-
-// router.post("/", createClient);
-// router.get("/:userId", getClientsByUser);
-
-// export default router;
+import { Router } from "express";
 
 const express = require("express");
 const router = express.Router();
