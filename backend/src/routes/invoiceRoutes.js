@@ -1,66 +1,7 @@
-// const express = require("express");
-// const router = express.Router();
-
-// const { createInvoice } = require("../controllers/invoiceController");
-
-// router.post("/", createInvoice);
-
-// module.exports = router;
-// ===============================
-// const express = require("express");
-// const router = express.Router();
-
-// const { createInvoice } = require("../controllers/invoiceController");
-// const prisma = require("../utils/prisma");
-
-// // Create invoice
-// router.post("/", createInvoice);
-
-// // Get all invoices
-// router.get("/", async (req, res) => {
-//   try {
-//     const invoices = await prisma.invoice.findMany({
-//       include: {
-//         items: true,
-//         client: true
-//       }
-//     });
-
-//     res.json(invoices);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Failed to fetch invoices" });
-//   }
-// });
-
-// module.exports = router;
-
-// const express = require("express");
-// const router = express.Router();
-
-// const {
-//   createInvoice,
-//   getInvoicesByUser,
-//   getInvoiceDetails
-// } = require("../controllers/invoiceController");
-
-// const {
-//   createInvoice,
-//   getInvoicesByUser,
-//   getInvoiceDetails,
-//   downloadInvoicePDF
-// } = require("../controllers/invoiceController");
-
-// router.post("/", createInvoice);
-
-// router.get("/:userId", getInvoicesByUser);
-// router.get("/details/:invoiceId", getInvoiceDetails);
-// router.get("/:id/pdf", downloadInvoicePDF);
-
-// module.exports = router;
-
 const express = require("express");
+
 const router = express.Router();
+
 const authMiddleware = require("../middleware/authMiddleware");
 
 const {
@@ -70,10 +11,37 @@ const {
   downloadInvoicePDF
 } = require("../controllers/invoiceController");
 
-// router.post("/", createInvoice);
 
-router.post("/", authMiddleware, createInvoice);
-router.get("/", authMiddleware, getInvoices);
-router.get("/:id", authMiddleware, getInvoiceById);
-router.get("/:id/pdf", authMiddleware, downloadInvoicePDF);
+// =============================
+// Invoice Routes
+// =============================
+
+// Create invoice
+router.post(
+  "/",
+  authMiddleware,
+  createInvoice
+);
+
+// Get all invoices for logged-in user
+router.get(
+  "/",
+  authMiddleware,
+  getInvoicesByUser
+);
+
+// Get single invoice details
+router.get(
+  "/:id",
+  authMiddleware,
+  getInvoiceDetails
+);
+
+// Download invoice PDF
+router.get(
+  "/:id/pdf",
+  authMiddleware,
+  downloadInvoicePDF
+);
+
 module.exports = router;
