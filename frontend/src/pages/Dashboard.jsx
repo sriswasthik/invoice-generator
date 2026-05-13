@@ -1,279 +1,388 @@
 import { useEffect, useState } from "react";
+
 import api from "../api/api";
+
 import InvoiceCard from "../components/InvoiceCard";
-import StatCard from "../components/StatCard";
+
+import AnalyticsChart from "../components/AnalyticsChart";
 
 function Dashboard() {
 
   const [invoices, setInvoices] = useState([]);
+
+  const [search, setSearch] = useState("");
+
+  const [statusFilter, setStatusFilter] =
+    useState("all");
 
   useEffect(() => {
     fetchInvoices();
   }, []);
 
   const fetchInvoices = async () => {
-    const res = await api.get("/invoices/1");
-    setInvoices(res.data);
-  };
 
-//   return (
-//     <div>
-//       <h2>Invoices</h2>
+    try {
 
-//       {invoices.map((invoice) => (
-//         <div key={invoice.id}>
-//           <strong>{invoice.invoiceNumber}</strong>
-//           <p>{invoice.client.name}</p>
-//           <p>Status: {invoice.status}</p>
-//           <p>Total: ₹{invoice.totalAmount}</p>
-//         </div>
-//       ))}
-//     </div>
-//   );
-const [search, setSearch] = useState("");
-const [statusFilter, setStatusFilter] = useState("all");
-const calculateStats = () => {
+      const res = await api.get("/invoices");
 
-  let revenue = 0;
-  let paid = 0;
-  let pending = 0;
+      setInvoices(res.data);
 
-  invoices.forEach(inv => {
+    } catch (error) {
 
-    if (inv.status === "paid") {
-      revenue += inv.totalAmount;
-      paid++;
-    } else {
-      pending++;
+      console.error(error);
     }
-
-  });
-
-  return {
-    revenue,
-    total: invoices.length,
-    paid,
-    pending
   };
-};
 
-<div style={styles.toolbar}>
+  // =========================
+  // ANALYTICS
+  // =========================
 
-  <input
-    placeholder="Search invoices or clients..."
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    style={styles.search}
-  />
+  const totalRevenue = invoices.reduce(
+    (sum, inv) =>
+      sum + (inv.totalAmount || 0),
+    0
+  );
 
-  <select
-    value={statusFilter}
-    onChange={(e) => setStatusFilter(e.target.value)}
-    style={styles.filter}
-  >
-    <option value="all">All</option>
-    <option value="paid">Paid</option>
-    <option value="partial">Partial</option>
-    <option value="draft">Draft</option>
-  </select>
+  const paidInvoices = invoices.filter(
+    (inv) => inv.status === "paid"
+  );
 
-</div>
+  const pendingInvoices = invoices.filter(
+    (inv) => inv.status !== "paid"
+  );
 
-const stats = calculateStats();
-const filteredInvoices = invoices.filter((inv) => {
-// 
-  const matchesSearch =
-    inv.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
-    inv.client.name.toLowerCase().includes(search.toLowerCase());
+  const totalPaid = paidInvoices.reduce(
+    (sum, inv) =>
+      sum + (inv.totalAmount || 0),
+    0
+  );
 
-  const matchesStatus =
-    statusFilter === "all" || inv.status === statusFilter;
+  const totalPending =
+    pendingInvoices.reduce(
+      (sum, inv) =>
+        sum + (inv.totalAmount || 0),
+      0
+    );
 
-  return matchesSearch && matchesStatus;
-});
+  // =========================
+  // FILTERS
+  // =========================
 
+  const filteredInvoices = invoices.filter(
+    (inv) => {
 
-return (
+      const matchesSearch =
+        inv.invoiceNumber
+          ?.toLowerCase()
+          .includes(
+            search.toLowerCase()
+          ) ||
+        inv.client?.name
+          ?.toLowerCase()
+          .includes(
+            search.toLowerCase()
+          );
 
-  
+      const matchesStatus =
+        statusFilter === "all" ||
+        inv.status === statusFilter;
 
-  <div style={{ maxWidth: "100%" }}>
+      return (
+        matchesSearch &&
+        matchesStatus
+      );
+    }
+  );
 
+  return (
 
-   <div style={styles.wrapper}>
+    <div style={styles.wrapper}>
 
-    {/* HEADER */}
-    <div style={styles.header}>
-      <div>
-        <h2>Dashboard</h2>
-        <p style={styles.subtext}>
-          Overview of your invoices and payments
-        </p>
+      {/* HEADER */}
+
+      <div style={styles.header}>
+
+        <div>
+
+          <h2>Dashboard</h2>
+
+          <p style={styles.subtext}>
+            Overview of your invoices
+            and payments
+          </p>
+
+        </div>
+
       </div>
-    </div>
-      
 
-  <div style={styles.statsGrid}>
-      <StatCard title="Revenue" value={`₹${stats.revenue}`} />
-      <StatCard title="Invoices" value={stats.total} />
-      <StatCard title="Paid" value={stats.paid} />
-      <StatCard title="Pending" value={stats.pending} />
-    </div>
+      {/* STATS */}
 
-    <div style={styles.section}>
+      <div style={styles.statsGrid}>
+
+        <div style={styles.statCard}>
+          <p style={styles.statLabel}>
+            Total Revenue
+          </p>
+
+          <h2>
+            ₹{totalRevenue}
+          </h2>
+        </div>
+
+        <div style={styles.statCard}>
+          <p style={styles.statLabel}>
+            Paid Revenue
+          </p>
+
+          <h2>
+            ₹{totalPaid}
+          </h2>
+        </div>
+
+        <div style={styles.statCard}>
+          <p style={styles.statLabel}>
+            Pending Revenue
+          </p>
+
+          <h2>
+            ₹{totalPending}
+          </h2>
+        </div>
+
+        <div style={styles.statCard}>
+          <p style={styles.statLabel}>
+            Invoices
+          </p>
+
+          <h2>
+            {invoices.length}
+          </h2>
+        </div>
+
+      </div>
+
+      {/* INSIGHTS */}
+
+      <div style={styles.insights}>
+
+        <div style={styles.insightCard}>
+
+          <h3>Collection Rate</h3>
+
+          <p style={styles.bigText}>
+
+            {
+              invoices.length
+                ? Math.round(
+                  (paidInvoices.length /
+                    invoices.length) * 100
+                )
+                : 0
+            }%
+
+          </p>
+
+        </div>
+
+        <div style={styles.insightCard}>
+
+          <h3>Pending Invoices</h3>
+
+          <p style={styles.bigText}>
+            {pendingInvoices.length}
+          </p>
+
+        </div>
+
+      </div>
+
+      <AnalyticsChart invoices={invoices} />
+
+      {/* FILTERS */}
+
+      <div style={styles.toolbar}>
+
+        <input
+          placeholder="Search invoices or clients..."
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          style={styles.search}
+        />
+
+        <select
+          value={statusFilter}
+          onChange={(e) =>
+            setStatusFilter(
+              e.target.value
+            )
+          }
+          style={styles.filter}
+        >
+
+          <option value="all">
+            All
+          </option>
+
+          <option value="paid">
+            Paid
+          </option>
+
+          <option value="partial">
+            Partial
+          </option>
+
+          <option value="draft">
+            Draft
+          </option>
+
+        </select>
+
+      </div>
+
+      {/* INVOICE SECTION */}
 
       <div style={styles.sectionHeader}>
+
         <h3>Recent Invoices</h3>
+
         <span style={styles.count}>
-          {filteredInvoices.length} items
+          {filteredInvoices.length}
+          {" "}items
         </span>
+
       </div>
 
       {filteredInvoices.length === 0 && (
+
         <p style={{ color: "#64748b" }}>
           No invoices found
         </p>
+
       )}
 
-      <div style={styles.grid}>
-        {filteredInvoices.map((invoice) => (
-          <InvoiceCard key={invoice.id} invoice={invoice} />
-        ))}
+      <div style={styles.invoiceGrid}>
+
+        {filteredInvoices.map(
+          (invoice) => (
+
+            <InvoiceCard
+              key={invoice.id}
+              invoice={invoice}
+            />
+
+          )
+        )}
+
       </div>
 
     </div>
-
-</div>
-
-    <h2>Invoices</h2>
-
-    {invoices.length === 0 && <p>No invoices found</p>}
-<p style={{ color: "#64748b", marginBottom: "10px" }}>
-  Showing {filteredInvoices.length} invoices
-</p>
-    <div style={styles.grid}>
-  {filteredInvoices.map((invoice) => (
-    <InvoiceCard key={invoice.id} invoice={invoice} />
-  ))}
-  {filteredInvoices.length === 0 && (
-  <p style={{ color: "#64748b" }}>
-    No invoices found. Try adjusting filters.
-  </p>
-)}
-</div>
-
-  </div>
-);
+  );
 }
-
-// const styles = {
-
-//   grid: {
-//     display: "grid",
-//     gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-//     gap: "20px"
-//   }
-
-// };
 
 const styles = {
 
-  card: {
-  width: "100%",
-  background: "white",
-  borderRadius: "12px",
-  padding: "16px",   // was 20
-  border: "1px solid #e2e8f0"
-},
-
-  toolbar: {
-  display: "flex",
-  gap: "12px",
-  marginBottom: "20px",
-  alignItems: "center"
-},
-
-search: {
-  flex: 1,
-  maxWidth: "320px",
-  padding: "10px",
-  borderRadius: "8px",
-  border: "1px solid #e2e8f0",
-  background: "white"
-},
-
-filter: {
-  padding: "10px",
-  borderRadius: "8px",
-  border: "1px solid #e2e8f0",
-  background: "white"
-},
-
-  statsGrid: {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-  gap: "20px"
-},
-
-  statCard: {
-    background: "white",
-    padding: "20px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-    border: "1px solid #e2e8f0"
-  },
-
-  grid: {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-  gap: "20px",
-  width: "100%"
-},
-
-   wrapper: {
-    width: "100%",
+  wrapper: {
+    width: "100%"
   },
 
   header: {
-    marginBottom: "25px"
+    marginBottom: "30px"
   },
 
   subtext: {
     color: "#64748b",
-    marginTop: "4px"
+    marginTop: "6px"
   },
 
   statsGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gridTemplateColumns:
+      "repeat(auto-fit, minmax(220px, 1fr))",
     gap: "20px",
     marginBottom: "30px"
   },
 
-  section: {
-    marginTop: "20px"
+  statCard: {
+    background: "white",
+    padding: "24px",
+    borderRadius: "18px",
+    border: "1px solid #e2e8f0",
+    boxShadow:
+      "0 4px 14px rgba(0,0,0,0.04)"
+  },
+
+  statLabel: {
+    color: "#64748b",
+    marginBottom: "10px",
+    fontSize: "14px"
+  },
+
+  insights: {
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(auto-fit, minmax(260px, 1fr))",
+    gap: "20px",
+    marginBottom: "30px"
+  },
+
+  insightCard: {
+    background: "white",
+    padding: "24px",
+    borderRadius: "18px",
+    border: "1px solid #e2e8f0"
+  },
+
+  bigText: {
+    fontSize: "42px",
+    fontWeight: "700",
+    marginTop: "10px"
+  },
+
+  toolbar: {
+    display: "flex",
+    gap: "14px",
+    marginBottom: "30px",
+    flexWrap: "wrap"
+  },
+
+  search: {
+    flex: 1,
+    minWidth: "240px",
+    padding: "12px",
+    borderRadius: "10px",
+    border: "1px solid #e2e8f0",
+    background: "white"
+  },
+
+  filter: {
+    padding: "12px",
+    borderRadius: "10px",
+    border: "1px solid #e2e8f0",
+    background: "white"
   },
 
   sectionHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "15px"
+    marginBottom: "20px"
   },
 
   count: {
-    fontSize: "13px",
-    color: "#64748b"
+    color: "#64748b",
+    fontSize: "14px"
   },
 
-  grid: {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-  gap: "20px",
-  width: "100%"
-}
+  invoiceGrid: {
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(auto-fit, minmax(340px, 1fr))",
+    gap: "24px",
+    width: "100%"
+  }
 
-  
 };
 
 export default Dashboard;

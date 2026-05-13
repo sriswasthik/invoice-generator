@@ -1,48 +1,90 @@
+import { useAuth } from "../context/AuthContext";
+
 function Layout({ page, setPage, children }) {
 
+  const { user, logout } = useAuth();
+
   return (
+
     <div style={styles.container}>
 
+      {/* =========================
+          SIDEBAR
+      ========================== */}
+
       <aside style={styles.sidebar}>
-        <h2 style={styles.logo}>InvoiceApp</h2>
 
-        <nav style={styles.nav}>
+        <div>
 
-          <div
-            style={{
-              ...styles.navItem,
-              ...(page === "dashboard" && styles.activeItem)
-            }}
-            onClick={() => setPage("dashboard")}
-          >
-            Dashboard
-          </div>
+          <h2 style={styles.logo}>
+            InvoiceApp
+          </h2>
 
-          <div
-            style={{
-              ...styles.navItem,
-              ...(page === "clients" && styles.activeItem)
-            }}
-            onClick={() => setPage("clients")}
-          >
-            Clients
-          </div>
+          <nav style={styles.nav}>
 
-          <div
-            style={{
-              ...styles.navItem,
-              ...(page === "create" && styles.activeItem)
-            }}
-            onClick={() => setPage("create")}
-          >
-            Create Invoice
+            <div
+              style={{
+                ...styles.navItem,
+                ...(page === "dashboard"
+                  ? styles.activeItem
+                  : {})
+              }}
+              onClick={() => setPage("dashboard")}
+            >
+              Dashboard
+            </div>
+
+            <div
+              style={{
+                ...styles.navItem,
+                ...(page === "clients"
+                  ? styles.activeItem
+                  : {})
+              }}
+              onClick={() => setPage("clients")}
+            >
+              Clients
+            </div>
+
+            <div
+              style={{
+                ...styles.navItem,
+                ...(page === "create"
+                  ? styles.activeItem
+                  : {})
+              }}
+              onClick={() => setPage("create")}
+            >
+              Create Invoice
+            </div>
+
+          </nav>
+
+        </div>
+
+        {/* =========================
+            USER SECTION
+        ========================== */}
+
+        <div style={styles.userBox}>
+
+          <div>
+
+            <p style={styles.userLabel}>
+              Logged in as
+            </p>
+
+            <strong style={styles.userEmail}>
+              {user?.email}
+            </strong>
+
           </div>
 
           <button
             style={styles.logoutBtn}
             onClick={() => {
 
-              localStorage.removeItem("token");
+              logout();
 
               window.location.reload();
             }}
@@ -50,19 +92,28 @@ function Layout({ page, setPage, children }) {
             Logout
           </button>
 
-        </nav>
+        </div>
+
       </aside>
+
+      {/* =========================
+          MAIN CONTENT
+      ========================== */}
 
       <main style={styles.main}>
 
         <div style={styles.topbar}>
-          <h1>Dashboard</h1>
+
+          <h1 style={styles.pageTitle}>
+            {page === "dashboard" && "Dashboard"}
+            {page === "clients" && "Clients"}
+            {page === "create" && "Create Invoice"}
+          </h1>
+
         </div>
 
         <div style={styles.content}>
-          <div key={page} style={styles.page}>
-            {children}
-          </div>
+          {children}
         </div>
 
       </main>
@@ -71,35 +122,60 @@ function Layout({ page, setPage, children }) {
   );
 }
 
-
-
 const styles = {
 
   container: {
     display: "flex",
     minHeight: "100vh",
-    width: "100%"
+    background: "#f8fafc"
   },
 
   sidebar: {
-    width: "230px",
+    width: "240px",
     background: "#0f172a",
     color: "white",
-    padding: "24px",
-    flexShrink: 0,
-    minHeight: "100vh"   // IMPORTANT (prevents shrinking)
+    padding: "24px 18px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    flexShrink: 0
+  },
+
+  logo: {
+    fontSize: "28px",
+    fontWeight: "700",
+    marginBottom: "40px"
+  },
+
+  nav: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px"
+  },
+
+  navItem: {
+    padding: "12px 14px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    color: "#cbd5e1",
+    transition: "0.2s ease",
+    fontSize: "15px",
+    fontWeight: "500"
+  },
+
+  activeItem: {
+    background: "#1e293b",
+    color: "white"
   },
 
   main: {
     flex: 1,
-    background: "#f8fafc",
     display: "flex",
-    flexDirection: "column",
-    width: "100%"
+    flexDirection: "column"
   },
 
   topbar: {
-    height: "70px",
+    height: "72px",
     background: "white",
     borderBottom: "1px solid #e2e8f0",
     display: "flex",
@@ -107,41 +183,47 @@ const styles = {
     padding: "0 30px"
   },
 
-  content: {
-    padding: "30px 20px",
-    width: "100%",
-    maxWidth: "100%",   // IMPORTANT
+  pageTitle: {
+    fontSize: "28px",
+    fontWeight: "700"
   },
 
-  nav: {
+  content: {
+    flex: 1,
+    padding: "30px",
+    width: "100%"
+  },
+
+  userBox: {
+    borderTop: "1px solid #1e293b",
+    paddingTop: "20px",
     display: "flex",
     flexDirection: "column",
-    gap: "6px"
+    gap: "14px"
   },
 
-  navItem: {
-    padding: "10px 12px",
-    borderRadius: "6px",
-    color: "#cbd5f5",
-    cursor: "pointer",
-    fontSize: "14px"
+  userLabel: {
+    fontSize: "12px",
+    color: "#94a3b8",
+    marginBottom: "6px"
   },
 
-  activeItem: {
-    background: "#1e293b",
+  userEmail: {
     color: "white",
-    fontWeight: "500"
-  },
-
-  page: {
-    animation: "fadeIn 0.3s ease"
+    fontSize: "14px",
+    wordBreak: "break-word"
   },
 
   logoutBtn: {
-    marginTop: "20px",
-    background: "#ef4444"
+    background: "#ef4444",
+    color: "white",
+    border: "none",
+    padding: "12px",
+    borderRadius: "10px",
+    cursor: "pointer",
+    fontWeight: "600"
   }
 
-
 };
+
 export default Layout;
