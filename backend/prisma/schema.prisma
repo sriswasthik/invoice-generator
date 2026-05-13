@@ -8,18 +8,14 @@ datasource db {
 }
 
 model User {
-  id           Int     @id @default(autoincrement())
-  name         String?
-  email        String  @unique
-  password     String
-  businessName String?
-  address      String?
-  gstin        String?
-
-  clients  Client[]
-  invoices Invoice[]
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
 
   createdAt DateTime @default(now())
+
+  clients   Client[]
+  invoices  Invoice[]
 }
 
 model Client {
