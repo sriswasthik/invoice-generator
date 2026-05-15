@@ -18,7 +18,7 @@ function Clients() {
   }, []);
 
   const fetchClients = async () => {
-    const res = await api.get(`/clients/${userId}`);
+    const res = await api.get("/clients");
     setClients(res.data);
   };
 

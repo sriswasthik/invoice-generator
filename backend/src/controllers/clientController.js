@@ -1,4 +1,9 @@
 const prisma = require("../utils/prisma");
+
+// ==========================
+// CREATE CLIENT
+// ==========================
+
 async function createClient(req, res) {
 
   try {
@@ -44,18 +49,29 @@ async function createClient(req, res) {
   }
 }
 
-async function getClientsByUser(req, res) {
+// ==========================
+// GET CLIENTS
+// ==========================
+
+async function getClientsByUser(
+  req,
+  res
+) {
 
   try {
 
-    const clients = await prisma.client.findMany({
-      where: {
-        userId: req.userId
-      },
-      orderBy: {
-        id: "desc"
-      }
-    });
+    const clients =
+      await prisma.client.findMany({
+
+        where: {
+          userId: req.userId
+        },
+
+        orderBy: {
+          id: "desc"
+        }
+
+      });
 
     res.json(clients);
 
@@ -69,6 +85,10 @@ async function getClientsByUser(req, res) {
     });
   }
 }
+
+// ==========================
+// DELETE CLIENT
+// ==========================
 
 async function deleteClient(req, res) {
 
@@ -91,8 +111,7 @@ async function deleteClient(req, res) {
     console.error(error);
 
     res.status(500).json({
-      error: "Failed to delete client",
-      details: error.message
+      error: "Failed to delete client"
     });
   }
 }
