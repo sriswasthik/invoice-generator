@@ -14,24 +14,24 @@ function InvoiceCard({ invoice }) {
 
   const recordPayment = async () => {
 
-  console.log("Sending:", invoice.id, paymentAmount);
+    console.log("Sending:", invoice.id, paymentAmount);
 
-  try {
-    const res = await api.post("/payments", {
-      invoiceId: invoice.id,
-      amount: Number(paymentAmount),
-      method: "manual"
-    });
+    try {
+      const res = await api.post("/payments", {
+        invoiceId: invoice.id,
+        amount: Number(paymentAmount),
+        method: "manual"
+      });
 
-    console.log("Response:", res.data);
+      console.log("Response:", res.data);
 
-    alert("Payment recorded");
+      alert("Payment recorded");
 
-  } catch (err) {
-    console.error("ERROR:", err);
-    alert("Payment failed");
-  }
-};
+    } catch (err) {
+      console.error("ERROR:", err);
+      alert("Payment failed");
+    }
+  };
 
   const getStatusColor = () => {
     switch (invoice.status) {
@@ -50,13 +50,13 @@ function InvoiceCard({ invoice }) {
     <div
       style={styles.card}
       onMouseEnter={(e) => {
-  e.currentTarget.style.transform = "translateY(-4px)";
-  e.currentTarget.style.zIndex = "1";   // ADD THIS
-}}
-onMouseLeave={(e) => {
-  e.currentTarget.style.transform = "translateY(0)";
-  e.currentTarget.style.zIndex = "0";
-}}
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.zIndex = "1";   // ADD THIS
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.zIndex = "0";
+      }}
     >
 
       <div style={styles.header}>
@@ -88,14 +88,29 @@ onMouseLeave={(e) => {
           type="number"
           placeholder="Payment Amount"
           onChange={(e) => {
-  console.log("typing:", e.target.value);
-  setPaymentAmount(e.target.value);
-}}
+            console.log("typing:", e.target.value);
+            setPaymentAmount(e.target.value);
+          }}
         />
-        
+
 
         <button onClick={recordPayment}>
           Record Payment
+        </button>
+
+        <button
+          style={styles.shareBtn}
+          onClick={() => {
+
+            const url =
+              `${window.location.origin}/invoice/public/${invoice.id}`;
+
+            navigator.clipboard.writeText(url);
+
+            alert("Invoice link copied!");
+          }}
+        >
+          Share Invoice
         </button>
       </div>
 
@@ -111,6 +126,15 @@ const styles = {
     border: "1px solid #e2e8f0",
     cursor: "pointer"
   },
+
+  shareBtn: {
+  background: "#0f172a",
+  color: "white",
+  border: "none",
+  padding: "10px 14px",
+  borderRadius: "8px",
+  cursor: "pointer"
+},
 
   header: {
     display: "flex",
@@ -129,7 +153,7 @@ const styles = {
     cursor: "pointer"
   }
 
-  
+
 };
 
 export default InvoiceCard;

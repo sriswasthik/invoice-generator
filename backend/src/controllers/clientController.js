@@ -1,5 +1,4 @@
 const prisma = require("../utils/prisma");
-
 async function createClient(req, res) {
 
   try {
@@ -13,21 +12,24 @@ async function createClient(req, res) {
 
     // validation
     if (!name) {
+
       return res.status(400).json({
         error: "Client name is required"
       });
     }
 
-    // create client linked to logged-in user
-    const client = await prisma.client.create({
-      data: {
-        name,
-        email,
-        phone,
-        address,
-        userId: req.userId
-      }
-    });
+    const client =
+      await prisma.client.create({
+
+        data: {
+          name,
+          email,
+          phone,
+          address,
+          userId: req.userId
+        }
+
+      });
 
     res.json(client);
 

@@ -12,6 +12,7 @@ const {
 } = require("../controllers/invoiceController");
 
 
+
 // =============================
 // Invoice Routes
 // =============================
@@ -42,6 +43,11 @@ router.get(
   "/:id/pdf",
   authMiddleware,
   downloadInvoicePDF
+);
+
+router.get(
+  "/public/:id",
+  getInvoiceDetails
 );
 
 module.exports = router;

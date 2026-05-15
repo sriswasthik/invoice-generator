@@ -10,6 +10,9 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
 import { useAuth } from "./context/AuthContext";
+import { Routes, Route } from "react-router-dom";
+
+import PublicInvoice from "./pages/PublicInvoice";
 
 function App() {
 
@@ -88,6 +91,33 @@ function App() {
 
     </Layout>
   );
+
+  return (
+
+  <Routes>
+
+    <Route
+      path="/invoice/public/:id"
+      element={<PublicInvoice />}
+    />
+
+    <Route
+      path="*"
+      element={
+
+        <Layout
+          page={page}
+          setPage={setPage}
+        >
+
+          {renderPage()}
+
+        </Layout>
+      }
+    />
+
+  </Routes>
+);
 }
 
 const styles = {
