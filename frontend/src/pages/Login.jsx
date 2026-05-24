@@ -226,7 +226,7 @@ const styles = {
   left: {
     position: "relative",
     background:
-      "linear-gradient(135deg, #4c0505, #fbf8ff)",
+      "linear-gradient(135deg, #000000, #fbf8ff)",
     color: "white",
     overflow: "hidden",
     display: "flex",
@@ -347,7 +347,7 @@ const styles = {
 
   button: {
     background:
-      "linear-gradient(135deg, #4c0505, #8164a8)",
+      "linear-gradient(135deg, #000000, #8164a8)",
     color: "white",
     border: "none",
     padding: "16px",

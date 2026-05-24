@@ -496,7 +496,7 @@ const styles = {
 
   addItemBtn: {
     background: "#eef2ff",
-    color: "#4338ca",
+    color: "#890054",
     border: "none",
     padding: "10px 14px",
     borderRadius: "10px",
@@ -548,7 +548,7 @@ const styles = {
 
   createBtn: {
     width: "100%",
-    background: "#4f46e5",
+    background: "#890054",
     color: "white",
     border: "none",
     padding: "16px",

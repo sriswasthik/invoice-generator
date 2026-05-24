@@ -1,117 +1,259 @@
 import api from "../api/api";
-import { useState } from "react";
 
-function InvoiceCard({ invoice }) {
+import { useState }
+from "react";
 
-  const [paymentAmount, setPaymentAmount] = useState("");
+function InvoiceCard({
+  invoice
+}) {
+
+  const [paymentAmount,
+    setPaymentAmount] =
+    useState("");
+
+  const [loading,
+    setLoading] =
+    useState(false);
 
   const downloadPDF = () => {
+
     window.open(
-      `http://localhost:5000/api/invoices/${invoice.id}/pdf`,
+      `${import.meta.env.VITE_API_URL}/invoices/${invoice.id}/pdf`,
       "_blank"
     );
   };
 
-  const recordPayment = async () => {
+  const recordPayment =
+    async () => {
 
-    console.log("Sending:", invoice.id, paymentAmount);
+      if (!paymentAmount) {
 
-    try {
-      const res = await api.post("/payments", {
-        invoiceId: invoice.id,
-        amount: Number(paymentAmount),
-        method: "manual"
-      });
+        return alert(
+          "Enter payment amount"
+        );
+      }
 
-      console.log("Response:", res.data);
+      try {
 
-      alert("Payment recorded");
+        setLoading(true);
 
-    } catch (err) {
-      console.error("ERROR:", err);
-      alert("Payment failed");
-    }
+        await api.post(
+          "/payments",
+          {
+            invoiceId: invoice.id,
+            amount:
+              Number(
+                paymentAmount
+              ),
+            method: "manual"
+          }
+        );
+
+        alert(
+          "Payment recorded"
+        );
+
+        window.location.reload();
+
+      } catch (err) {
+
+        console.error(err);
+
+        alert(
+          "Payment failed"
+        );
+
+      } finally {
+
+        setLoading(false);
+      }
+    };
+
+  const copyShareLink = () => {
+
+    const url =
+      `${window.location.origin}/invoice/public/${invoice.id}`;
+
+    navigator.clipboard.writeText(
+      url
+    );
+
+    alert(
+      "Invoice link copied"
+    );
   };
 
-  const getStatusColor = () => {
-    switch (invoice.status) {
+  const getStatusStyles = () => {
+
+    switch (
+      invoice.status
+    ) {
+
       case "paid":
-        return "green";
+
+        return {
+          background:
+            "#dcfce7",
+          color:
+            "#166534"
+        };
+
       case "partial":
-        return "orange";
-      case "draft":
-        return "gray";
+
+        return {
+          background:
+            "#fef3c7",
+          color:
+            "#92400e"
+        };
+
       default:
-        return "black";
+
+        return {
+          background:
+            "#e2e8f0",
+          color:
+            "#475569"
+        };
     }
   };
 
   return (
-    <div
-      style={styles.card}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.zIndex = "1";   // ADD THIS
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.zIndex = "0";
-      }}
-    >
 
-      <div style={styles.header}>
-        <h3>{invoice.invoiceNumber}</h3>
-        <span style={{
-          padding: "4px 10px",
-          borderRadius: "6px",
-          background: invoice.status === "paid"
-            ? "#dcfce7"
-            : invoice.status === "partial"
-              ? "#fef3c7"
-              : "#e5e7eb"
-        }}>
+    <div style={styles.card}>
+
+      {/* TOP */}
+
+      <div style={styles.top}>
+
+        <div>
+
+          <p style={styles.label}>
+            Invoice
+          </p>
+
+          <h3 style={styles.invoiceNo}>
+            {
+              invoice.invoiceNumber
+            }
+          </h3>
+
+        </div>
+
+        <div
+          style={{
+            ...styles.status,
+            ...getStatusStyles()
+          }}
+        >
+
           {invoice.status}
-        </span>
+
+        </div>
+
       </div>
 
-      <p><strong>Client:</strong> {invoice.client.name}</p>
-      <p><strong>Total:</strong> ₹{invoice.totalAmount}</p>
-      <p><strong>Due:</strong> {new Date(invoice.dueDate).toDateString()}</p>
+      {/* CLIENT */}
 
-      <button onClick={downloadPDF} style={styles.button}>
-        Download PDF
-      </button>
+      <div style={styles.clientSection}>
 
-      {/* Payment UI */}
-      <div style={{ marginTop: "10px" }}>
+        <div>
+
+          <p style={styles.smallLabel}>
+            Client
+          </p>
+
+          <h4 style={styles.clientName}>
+            {
+              invoice.client?.name
+            }
+          </h4>
+
+        </div>
+
+        <div>
+
+          <p style={styles.smallLabel}>
+            Due Date
+          </p>
+
+          <p style={styles.dueDate}>
+            {
+              new Date(
+                invoice.dueDate
+              ).toLocaleDateString()
+            }
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* TOTAL */}
+
+      <div style={styles.totalSection}>
+
+        <p style={styles.smallLabel}>
+          Total Amount
+        </p>
+
+        <h2 style={styles.total}>
+          ₹{
+            invoice.totalAmount
+          }
+        </h2>
+
+      </div>
+
+      {/* PAYMENT */}
+
+      <div style={styles.paymentBox}>
+
         <input
           type="number"
-          placeholder="Payment Amount"
-          onChange={(e) => {
-            console.log("typing:", e.target.value);
-            setPaymentAmount(e.target.value);
-          }}
+          placeholder="Payment amount"
+          value={paymentAmount}
+          onChange={(e) =>
+            setPaymentAmount(
+              e.target.value
+            )
+          }
+          style={styles.input}
         />
 
+        <button
+          style={styles.paymentBtn}
+          onClick={recordPayment}
+        >
 
-        <button onClick={recordPayment}>
-          Record Payment
+          {
+            loading
+              ? "Processing..."
+              : "Record Payment"
+          }
+
+        </button>
+
+      </div>
+
+      {/* ACTIONS */}
+
+      <div style={styles.actions}>
+
+        <button
+          style={styles.downloadBtn}
+          onClick={downloadPDF}
+        >
+          Download PDF
         </button>
 
         <button
           style={styles.shareBtn}
-          onClick={() => {
-
-            const url =
-              `${window.location.origin}/invoice/public/${invoice.id}`;
-
-            navigator.clipboard.writeText(url);
-
-            alert("Invoice link copied!");
-          }}
+          onClick={copyShareLink}
         >
-          Share Invoice
+          Share
         </button>
+
       </div>
 
     </div>
@@ -119,40 +261,139 @@ function InvoiceCard({ invoice }) {
 }
 
 const styles = {
+
   card: {
-    background: "var(--card)",
-    borderRadius: "14px",
-    padding: "20px",
-    border: "1px solid #e2e8f0",
-    cursor: "pointer"
+    background: "white",
+    borderRadius: "26px",
+    padding: "26px",
+    border:
+      "1px solid #e2e8f0",
+
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.05)",
+
+    transition:
+      "all 0.25s ease",
+
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px"
   },
 
-  shareBtn: {
-  background: "var(--sidebar)",
-  color: "white",
-  border: "none",
-  padding: "10px 14px",
-  borderRadius: "8px",
-  cursor: "pointer"
-},
-
-  header: {
+  top: {
     display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "18px"
+    justifyContent:
+      "space-between",
+    alignItems: "flex-start"
+  },
+
+  label: {
+    color: "#64748b",
+    fontSize: "13px",
+    marginBottom: "8px"
+  },
+
+  invoiceNo: {
+    fontSize: "24px",
+    fontWeight: "800"
   },
 
   status: {
-    fontWeight: "bold"
+    padding: "10px 14px",
+    borderRadius: "999px",
+    fontSize: "13px",
+    fontWeight: "700",
+    textTransform:
+      "capitalize"
   },
 
-  button: {
-    marginTop: "10px",
-    padding: "8px 12px",
-    cursor: "pointer"
-  }
+  clientSection: {
+    display: "flex",
+    justifyContent:
+      "space-between",
+    gap: "20px"
+  },
 
+  smallLabel: {
+    color: "#64748b",
+    fontSize: "13px",
+    marginBottom: "8px"
+  },
+
+  clientName: {
+    fontSize: "18px",
+    fontWeight: "700"
+  },
+
+  dueDate: {
+    color: "#334155",
+    fontWeight: "500"
+  },
+
+  totalSection: {
+    background: "#f8fafc",
+    borderRadius: "18px",
+    padding: "20px"
+  },
+
+  total: {
+    fontSize: "34px",
+    fontWeight: "800",
+    marginTop: "6px"
+  },
+
+  paymentBox: {
+    display: "flex",
+    gap: "12px"
+  },
+
+  input: {
+    flex: 1,
+    padding: "14px",
+    borderRadius: "14px",
+    border:
+      "1px solid #dbe3ec",
+    outline: "none",
+    fontSize: "14px"
+  },
+
+  paymentBtn: {
+    background:
+      "#4f46e5",
+    color: "white",
+    border: "none",
+    padding: "14px 18px",
+    borderRadius: "14px",
+    cursor: "pointer",
+    fontWeight: "700",
+    whiteSpace: "nowrap"
+  },
+
+  actions: {
+    display: "flex",
+    gap: "12px"
+  },
+
+  downloadBtn: {
+    flex: 1,
+    background: "#111827",
+    color: "white",
+    border: "none",
+    padding: "14px",
+    borderRadius: "14px",
+    cursor: "pointer",
+    fontWeight: "700"
+  },
+
+  shareBtn: {
+    background: "#eef2ff",
+    color: "#4338ca",
+    border: "none",
+    padding: "14px 18px",
+    borderRadius: "14px",
+    cursor: "pointer",
+    fontWeight: "700"
+  }
 
 };
 

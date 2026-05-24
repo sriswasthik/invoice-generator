@@ -1,162 +1,494 @@
-const prisma = require("../utils/prisma");
-const { calculateInvoiceTotals } = require("../services/invoiceService");
-const generateInvoicePDF = require("../utils/pdfGenerator");
+import getPublicInvoice from "./invoiceController.js"; 
 
-async function createInvoice(req, res) {
+router.get("/public/:invoiceId", getPublicInvoice);
+
+const prisma =
+  require("../utils/prisma");
+
+const {
+  calculateInvoiceTotals
+} = require(
+  "../services/invoiceService"
+);
+
+const generateInvoicePDF =
+  require(
+    "../utils/pdfGenerator"
+  );
+
+// =====================================
+// CREATE INVOICE
+// =====================================
+
+async function createInvoice(
+  req,
+  res
+) {
+
   try {
-    const { userId, clientId, invoiceNumber, issueDate, dueDate, items } = req.body;
 
-    if (!items || items.length === 0) {
-      return res.status(400).json({ error: "Invoice must contain items" });
+    const {
+
+      clientId,
+
+      invoiceNumber,
+
+      issueDate,
+
+      dueDate,
+
+      items
+
+    } = req.body;
+
+    // =====================
+    // VALIDATION
+    // =====================
+
+    if (
+      !clientId ||
+      !invoiceNumber ||
+      !issueDate ||
+      !dueDate
+    ) {
+
+      return res.status(400).json({
+
+        error:
+          "Missing required invoice fields"
+
+      });
     }
 
-    const totals = calculateInvoiceTotals(items);
+    if (
+      !items ||
+      items.length === 0
+    ) {
 
-    const invoice = await prisma.invoice.create({
-      data: {
-        userId: req.userId, // Use authenticated user ID
-        invoiceNumber,
-        issueDate: new Date(issueDate),
-        dueDate: new Date(dueDate),
-        status: "draft",
-        totalAmount: totals.grandTotal,
-        taxAmount: totals.totalTax,
-        userId,
-        clientId
-      }
+      return res.status(400).json({
+
+        error:
+          "Invoice must contain at least one item"
+
+      });
+    }
+
+    // =====================
+    // VERIFY CLIENT OWNERSHIP
+    // =====================
+
+    const client =
+      await prisma.client.findFirst({
+
+        where: {
+
+          id:
+            Number(clientId),
+
+          userId:
+            req.userId
+        }
+
+      });
+
+    if (!client) {
+
+      return res.status(404).json({
+
+        error:
+          "Client not found"
+
+      });
+    }
+
+    // =====================
+    // CALCULATE TOTALS
+    // =====================
+
+    const totals =
+      calculateInvoiceTotals(
+        items
+      );
+
+    // =====================
+    // CREATE INVOICE
+    // =====================
+
+    const invoice =
+      await prisma.invoice.create({
+
+        data: {
+
+          invoiceNumber,
+
+          issueDate:
+            new Date(issueDate),
+
+          dueDate:
+            new Date(dueDate),
+
+          status: "draft",
+
+          totalAmount:
+            totals.grandTotal,
+
+          taxAmount:
+            totals.totalTax,
+
+          userId:
+            req.userId,
+
+          clientId:
+            Number(clientId),
+
+          items: {
+
+            create:
+              items.map(
+                (item) => ({
+
+                  description:
+                    item.description,
+
+                  quantity:
+                    Number(
+                      item.quantity
+                    ),
+
+                  price:
+                    Number(
+                      item.price
+                    ),
+
+                  taxPercent:
+                    Number(
+                      item.taxPercent || 0
+                    ),
+
+                  amount:
+                    (
+                      Number(
+                        item.quantity
+                      ) *
+                      Number(
+                        item.price
+                      )
+                    )
+
+                })
+              )
+
+          }
+
+        },
+
+        include: {
+
+          client: true,
+
+          items: true
+
+        }
+
+      });
+
+    // =====================
+    // RESPONSE
+    // =====================
+
+    res.status(201).json({
+
+      message:
+        "Invoice created successfully",
+
+      invoice
+
     });
 
-    res.json(invoice);
-
   } catch (error) {
-    console.error("Create invoice error:", error);
-    res.status(500).json({ error: error.message });
+
+    console.error(
+      "CREATE INVOICE ERROR:",
+      error
+    );
+
+    res.status(500).json({
+
+      error:
+        "Failed to create invoice"
+
+    });
   }
 }
 
-async function getInvoicesByUser(req, res) {
+// =====================================
+// GET USER INVOICES
+// =====================================
+
+async function getInvoicesByUser(
+  req,
+  res
+) {
+
   try {
-    const { userId } = req.params;
 
-    const invoices = await prisma.invoice.findMany({
-      where: {
-        userId: req.userId // Use authenticated user ID
-      },
-      include: {
-        client: true
-      },
-      orderBy: {
-        id: "desc"
-      }
-    });
+    const invoices =
+      await prisma.invoice.findMany({
 
-    res.json(invoices);
+        where: {
+          userId:
+            req.userId
+        },
+
+        include: {
+
+          client: true,
+
+          items: true,
+
+          payments: true
+
+        },
+
+        orderBy: {
+          createdAt:
+            "desc"
+        }
+
+      });
+
+    res.status(200).json(
+      invoices
+    );
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch invoices" });
+
+    console.error(
+      "GET INVOICES ERROR:",
+      error
+    );
+
+    res.status(500).json({
+
+      error:
+        "Failed to fetch invoices"
+
+    });
   }
 }
 
-async function getInvoiceDetails(req, res) {
-  try {
-    const { invoiceId } = req.params;
+// =====================================
+// GET SINGLE INVOICE
+// =====================================
 
-    const invoice = await prisma.invoice.findUnique({
-      where: {
-        id: Number(invoiceId)
-      },
-      include: {
-        client: true,
-        items: true,
-        payments: true
-      }
-    });
+async function getInvoiceDetails(
+  req,
+  res
+) {
+
+  try {
+
+    const invoiceId =
+      Number(
+        req.params.id
+      );
+
+    const invoice =
+      await prisma.invoice.findFirst({
+
+        where: {
+
+          id:
+            invoiceId,
+
+          userId:
+            req.userId
+        },
+
+        include: {
+
+          client: true,
+
+          items: true,
+
+          payments: true
+
+        }
+
+      });
 
     if (!invoice) {
-      return res.status(404).json({ error: "Invoice not found" });
+
+      return res.status(404).json({
+
+        error:
+          "Invoice not found"
+
+      });
     }
 
-    res.json(invoice);
+    res.status(200).json(
+      invoice
+    );
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch invoice details" });
+
+    console.error(
+      "GET INVOICE ERROR:",
+      error
+    );
+
+    res.status(500).json({
+
+      error:
+        "Failed to fetch invoice"
+
+    });
   }
 }
 
-const PDFDocument = require("pdfkit");
+// =====================================
+// PUBLIC INVOICE
+// =====================================
 
-// async function downloadInvoicePDF(req, res) {
-//   try {
-//     const { invoiceId } = req.params;
+async function getPublicInvoice(
+  req,
+  res
+) {
 
-//     const invoice = await prisma.invoice.findUnique({
-//       where: { id: Number(invoiceId) },
-//       include: {
-//         client: true,
-//         items: true
-//       }
-//     });
-
-//     if (!invoice) {
-//       return res.status(404).json({ error: "Invoice not found" });
-//     }
-
-//     const doc = new PDFDocument();
-
-//     res.setHeader("Content-Type", "application/pdf");
-//     res.setHeader(
-//       "Content-Disposition",
-//       `attachment; filename=invoice-${invoice.id}.pdf`
-//     );
-
-//     doc.pipe(res);
-
-//     doc.fontSize(20).text("Invoice", { align: "center" });
-//     doc.moveDown();
-
-//     doc.text(`Invoice Number: ${invoice.invoiceNumber}`);
-//     doc.text(`Client: ${invoice.client.name}`);
-//     doc.text(`Total: ${invoice.totalAmount}`);
-
-//     doc.end();
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Failed to generate PDF" });
-//   }
-// }
-
-
-async function downloadInvoicePDF(req, res) {
   try {
-    const { invoiceId } = req.params;
 
-    const invoice = await prisma.invoice.findUnique({
-      where: { id: Number(invoiceId) },
-      include: {
-        client: true,
-        items: true
-      }
-    });
+    const invoiceId =
+      Number(
+        req.params.id
+      );
+
+    const invoice =
+      await prisma.invoice.findUnique({
+
+        where: {
+          id:
+            invoiceId
+        },
+
+        include: {
+
+          client: true,
+
+          items: true
+
+        }
+
+      });
 
     if (!invoice) {
-      return res.status(404).json({ error: "Invoice not found" });
+
+      return res.status(404).json({
+
+        error:
+          "Invoice not found"
+
+      });
     }
 
-    // ✅ THIS IS IMPORTANT
-    generateInvoicePDF(invoice, res);
+    res.status(200).json(
+      invoice
+    );
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to generate PDF" });
+
+    console.error(
+      "PUBLIC INVOICE ERROR:",
+      error
+    );
+
+    res.status(500).json({
+
+      error:
+        "Failed to fetch public invoice"
+
+    });
+  }
+}
+
+// =====================================
+// DOWNLOAD PDF
+// =====================================
+
+async function downloadInvoicePDF(
+  req,
+  res
+) {
+
+  try {
+
+    const invoiceId =
+      Number(
+        req.params.id
+      );
+
+    const invoice =
+      await prisma.invoice.findFirst({
+
+        where: {
+
+          id:
+            invoiceId,
+
+          userId:
+            req.userId
+        },
+
+        include: {
+
+          client: true,
+
+          items: true
+
+        }
+
+      });
+
+    if (!invoice) {
+
+      return res.status(404).json({
+
+        error:
+          "Invoice not found"
+
+      });
+    }
+
+    generateInvoicePDF(
+      invoice,
+      res
+    );
+
+  } catch (error) {
+
+    console.error(
+      "PDF ERROR:",
+      error
+    );
+
+    res.status(500).json({
+
+      error:
+        "Failed to generate PDF"
+
+    });
   }
 }
 
 module.exports = {
+
   createInvoice,
+
   getInvoicesByUser,
+
   getInvoiceDetails,
+
+  getPublicInvoice,
+
   downloadInvoicePDF
 };

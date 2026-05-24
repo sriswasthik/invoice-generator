@@ -1,142 +1,6 @@
-* {
-  box-sizing: border-box;
-}
-
-:root {
-
-  --primary: #6366f1;
-  --sidebar: #0f172a;
-
-  --background: #f8fafc;
-  --card: "var(--card)";
-
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-
-}
-
-button {
-
-  background: var(--primary);
-  border: none;
-  color: white;
-
-  padding: 10px 14px;
-  border-radius: 6px;
-
-  font-size: 14px;
-  font-weight: 500;
-
-  cursor: pointer;
-}
-
-button {
-  background: #6366f1;
-  border: none;
-  color: white;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #4f46e5;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-body {
-  margin: 0;
-  font-family: Inter, system-ui, Arial, sans-serif;
-  background: #f4f6fb;
-}
-
-/* Typography */
-
-h1 {
-  font-size: 28px;
-  margin-bottom: 20px;
-}
-
-h2 {
-  font-size: 22px;
-  margin-bottom: 15px;
-}
-
-/* Buttons */
-
-button {
-  background: #4f46e5;
-  border: none;
-  color: white;
-  padding: 10px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-button:hover {
-  background: #4338ca;
-}
-
-/* Inputs */
-
-input, select {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-}
-
-/* Card style */
-
-.card {
-  background: var(--card);
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-/* Smooth feel everywhere */
-* {
-  transition: all 0.2s ease;
-}
-
-/* Card hover lift */
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-}
-
-/* Button interaction */
-button:active {
-  transform: scale(0.96);
-}
-
-/* Input focus */
-input:focus, select:focus {
-  outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
-}
-
-.card {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* =========================================
+   RESET
+========================================= */
 
 * {
   margin: 0;
@@ -144,65 +8,292 @@ input:focus, select:focus {
   box-sizing: border-box;
 }
 
-body {
-
-  font-family:
-    Inter,
-    sans-serif;
-
-  background: var(--bg);
-
-  color: var(--text);
-
-  transition:
-    background 0.25s ease,
-    color 0.25s ease;
-}
-
-/* =========================
-   LIGHT THEME
-========================= */
+/* =========================================
+   ROOT VARIABLES
+========================================= */
 
 :root {
 
-  --bg: #f8fafc;
+  /* COLORS */
 
-  --card: #ffffff;
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
 
   --sidebar: #0f172a;
 
-  --text: #0f172a;
+  --background: #f8fafc;
 
-  --subtext: #64748b;
+  --card: #ffffff;
+
+  --card-secondary: #f8fafc;
+
+  --text-main: #0f172a;
+
+  --text-muted: #64748b;
 
   --border: #e2e8f0;
 
-  --primary: #4f46e5;
+  --success: #22c55e;
 
-  --hover: #eef2ff;
+  --danger: #ef4444;
+
+  --warning: #f59e0b;
+
+  /* SHADOWS */
+
+  --shadow-sm:
+    0 2px 8px rgba(0,0,0,0.04);
+
+  --shadow-md:
+    0 10px 30px rgba(0,0,0,0.06);
+
+  --shadow-lg:
+    0 20px 50px rgba(0,0,0,0.08);
+
+  /* RADIUS */
+
+  --radius-sm: 10px;
+
+  --radius-md: 16px;
+
+  --radius-lg: 24px;
+
+  /* TRANSITIONS */
+
+  --transition:
+    all 0.25s ease;
 }
 
-/* =========================
-   DARK THEME
-========================= */
+/* =========================================
+   BODY
+========================================= */
 
-.dark {
+body {
 
-  --bg: #0f172a;
+  font-family:
+    "Manrope", sans-serif;
 
-  --card: #111827;
+  background:
+    linear-gradient(
+      to bottom right,
+      #f8fafc,
+      #eef2ff
+    );
 
-  --sidebar: #020617;
+  color: var(--text-main);
 
-  --text: #f8fafc;
+  min-height: 100vh;
 
-  --subtext: #94a3b8;
+  -webkit-font-smoothing:
+    antialiased;
 
-  --border: #1f2937;
+  overflow-x: hidden;
+}
 
-  --primary: #6366f1;
+/* =========================================
+   TYPOGRAPHY
+========================================= */
 
-  --hover: #1e293b;
+h1 {
+  font-size: 42px;
+  font-weight: 800;
+}
 
-  --card-hover: #172033;
+h2 {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+p {
+  line-height: 1.6;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+button {
+
+  border: none;
+
+  outline: none;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+  transition: var(--transition);
+}
+
+button:hover {
+
+  transform: translateY(-1px);
+
+  opacity: 0.96;
+}
+
+button:active {
+
+  transform: scale(0.97);
+}
+
+/* =========================================
+   INPUTS
+========================================= */
+
+input,
+select,
+textarea {
+
+  width: 100%;
+
+  border:
+    1px solid var(--border);
+
+  outline: none;
+
+  padding: 14px 16px;
+
+  border-radius:
+    var(--radius-sm);
+
+  font-size: 14px;
+
+  font-family: inherit;
+
+  background: white;
+
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+
+  border-color:
+    var(--primary);
+
+  box-shadow:
+    0 0 0 4px rgba(79,70,229,0.12);
+}
+
+/* =========================================
+   CARD SYSTEM
+========================================= */
+
+.card {
+
+  background:
+    var(--card);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius-md);
+
+  box-shadow:
+    var(--shadow-sm);
+
+  transition:
+    var(--transition);
+}
+
+.card:hover {
+
+  transform:
+    translateY(-4px);
+
+  box-shadow:
+    var(--shadow-md);
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+
+  background:
+    #cbd5e1;
+
+  border-radius: 999px;
+}
+
+/* =========================================
+   FADE ANIMATION
+========================================= */
+
+@keyframes fadeIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(6px);
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================================
+   GLOBAL PAGE ANIMATION
+========================================= */
+
+.page-enter {
+
+  animation:
+    fadeIn 0.3s ease;
+}
+
+/* =========================================
+   SELECTION
+========================================= */
+
+::selection {
+
+  background:
+    rgba(79,70,229,0.18);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+  h1 {
+    font-size: 34px;
+  }
+
+  h2 {
+    font-size: 26px;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  body {
+    font-size: 14px;
+  }
+
 }

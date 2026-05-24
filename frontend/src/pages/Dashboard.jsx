@@ -407,7 +407,7 @@ const styles = {
   hero: {
     background:
       "linear-gradient(135deg, #4c0505, #7650a7)",
-    borderRadius: "28px",
+    borderRadius: "16px",
     padding: "36px",
     color: "white",
     display: "flex",
@@ -465,7 +465,7 @@ const styles = {
   primaryCard: {
     background: "#111827",
     color: "white",
-    borderRadius: "24px",
+    borderRadius: "16px",
     padding: "28px",
     boxShadow:
       "0 10px 30px rgba(0,0,0,0.08)"
@@ -473,7 +473,7 @@ const styles = {
 
   statCard: {
     background: "white",
-    borderRadius: "24px",
+    borderRadius: "16px",
     padding: "28px",
     border: "1px solid #e2e8f0",
     boxShadow:
@@ -511,7 +511,7 @@ const styles = {
 
   insightCard: {
     background: "white",
-    borderRadius: "24px",
+    borderRadius: "16px",
     padding: "28px",
     border: "1px solid #e2e8f0",
     display: "flex",
@@ -533,7 +533,7 @@ const styles = {
 
   chartCard: {
     background: "white",
-    borderRadius: "28px",
+    borderRadius: "16px",
     padding: "30px",
     border: "1px solid #e2e8f0",
     marginBottom: "30px",

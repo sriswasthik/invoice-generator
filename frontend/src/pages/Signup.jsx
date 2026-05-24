@@ -85,15 +85,15 @@ function Signup({
           <div style={styles.features}>
 
             <div style={styles.feature}>
-              🚀 Fast Invoice Creation
+              Fast Invoice Creation
             </div>
 
             <div style={styles.feature}>
-              📊 Revenue Analytics
+              Revenue Analytics
             </div>
 
             <div style={styles.feature}>
-              🔒 Secure Cloud Access
+              Secure Cloud Access
             </div>
 
           </div>
@@ -213,7 +213,7 @@ const styles = {
   left: {
     position: "relative",
     background:
-      "linear-gradient(135deg, #4c0505, #fbf8ff)",
+      "linear-gradient(135deg, #000000, #fbf8ff)",
     color: "white",
     overflow: "hidden",
     display: "flex",
@@ -333,7 +333,7 @@ const styles = {
 
   button: {
     background:
-      "linear-gradient(135deg, #4c0505, #7b56ab)",
+      "linear-gradient(135deg, #000000, #7b56ab)",
     color: "white",
     border: "none",
     padding: "16px",

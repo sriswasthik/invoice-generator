@@ -1,159 +1,274 @@
-// const prisma = require("../config/db");
-// const bcrypt = require("bcrypt");
-// const jwt = require("jsonwebtoken");
+const prisma =
+  require("../config/db");
 
-// exports.signup = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
+const bcrypt =
+  require("bcrypt");
 
-//     // check if user exists
-//     const existing = await prisma.user.findUnique({
-//       where: { email }
-//     });
+const jwt =
+  require("jsonwebtoken");
 
-//     if (existing) {
-//       return res.status(400).json({ error: "User already exists" });
-//     }
+// =====================================
+// SIGNUP
+// =====================================
 
-//     const hashed = await bcrypt.hash(password, 10);
-
-//     const user = await prisma.user.create({
-//       data: { email, password: hashed }
-//     });
-
-//     res.json({ message: "User created successfully" });
-
-// //   } catch (err) {
-// //     res.status(500).json({ error: "Signup failed" });
-// //   }
-
-//   } catch (error) {
-//   console.log(error);
-
-//   res.status(500).json({
-//     error: error.message
-//   });
-// }
-// };
-
-// exports.login = async (req, res) => {
-//   const { email, password } = req.body;
-
-//   const user = await prisma.user.findUnique({
-//     where: { email }
-//   });
-
-//   if (!user) return res.status(404).json({ error: "User not found" });
-
-//   const valid = await bcrypt.compare(password, user.password);
-
-//   if (!valid) return res.status(401).json({ error: "Invalid password" });
-
-//   const token = jwt.sign({ userId: user.id }, "secret");
-
-//   res.json({ token });
-// };
-
-const prisma = require("../config/db");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-
-exports.signup = async (req, res) => {
+exports.signup = async (
+  req,
+  res
+) => {
 
   try {
 
-    const { email, password } = req.body;
+    let {
+      email,
+      password
+    } = req.body;
 
-    // check existing user
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
+    // =====================
+    // VALIDATION
+    // =====================
+
+    if (
+      !email ||
+      !password
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Email and password are required"
+      });
+    }
+
+    email =
+      email.trim().toLowerCase();
+
+    password =
+      password.trim();
+
+    if (
+      password.length < 6
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Password must be at least 6 characters"
+      });
+    }
+
+    // =====================
+    // CHECK EXISTING USER
+    // =====================
+
+    const existingUser =
+      await prisma.user.findUnique({
+        where: { email }
+      });
 
     if (existingUser) {
-      return res.status(400).json({
-        error: "User already exists"
+
+      return res.status(409).json({
+        error:
+          "User already exists"
       });
     }
 
-    // hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // =====================
+    // HASH PASSWORD
+    // =====================
 
-    // create user
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword
-      }
-    });
+    const hashedPassword =
+      await bcrypt.hash(
+        password,
+        10
+      );
 
-    res.status(201).json({
-      message: "Account created successfully"
-    });
+    // =====================
+    // CREATE USER
+    // =====================
 
-  } catch (err) {
+    const user =
+      await prisma.user.create({
 
-    console.log(err);
+        data: {
+          email,
+          password:
+            hashedPassword
+        }
 
-    res.status(500).json({
-      error: "Signup failed"
-    });
-  }
-};
-
-exports.login = async (req, res) => {
-
-  try {
-
-    const { email, password } = req.body;
-
-    // find user
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        error: "User not found"
       });
-    }
 
-    // compare password
-    const validPassword = await bcrypt.compare(
-      password,
-      user.password
-    );
+    // =====================
+    // TOKEN
+    // =====================
 
-    if (!validPassword) {
-      return res.status(401).json({
-        error: "Invalid password"
-      });
-    }
-
-    // generate JWT
     const token = jwt.sign(
+
       {
         userId: user.id
       },
-      "secret123",
+
+      process.env.JWT_SECRET,
+
       {
         expiresIn: "7d"
       }
     );
 
-    res.json({
+    // =====================
+    // RESPONSE
+    // =====================
+
+    res.status(201).json({
+
+      message:
+        "Account created successfully",
+
       token,
+
       user: {
         id: user.id,
         email: user.email
       }
+
     });
 
-  } catch (err) {
+  } catch (error) {
 
-    console.log(err);
+    console.error(
+      "SIGNUP ERROR:",
+      error
+    );
 
     res.status(500).json({
-      error: "Login failed"
+
+      error:
+        "Failed to create account"
+
+    });
+  }
+};
+
+// =====================================
+// LOGIN
+// =====================================
+
+exports.login = async (
+  req,
+  res
+) => {
+
+  try {
+
+    let {
+      email,
+      password
+    } = req.body;
+
+    // =====================
+    // VALIDATION
+    // =====================
+
+    if (
+      !email ||
+      !password
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Email and password are required"
+      });
+    }
+
+    email =
+      email.trim().toLowerCase();
+
+    password =
+      password.trim();
+
+    // =====================
+    // FIND USER
+    // =====================
+
+    const user =
+      await prisma.user.findUnique({
+
+        where: { email }
+
+      });
+
+    if (!user) {
+
+      return res.status(401).json({
+
+        error:
+          "Invalid credentials"
+
+      });
+    }
+
+    // =====================
+    // CHECK PASSWORD
+    // =====================
+
+    const validPassword =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
+
+    if (!validPassword) {
+
+      return res.status(401).json({
+
+        error:
+          "Invalid credentials"
+
+      });
+    }
+
+    // =====================
+    // GENERATE TOKEN
+    // =====================
+
+    const token = jwt.sign(
+
+      {
+        userId: user.id
+      },
+
+      process.env.JWT_SECRET,
+
+      {
+        expiresIn: "7d"
+      }
+    );
+
+    // =====================
+    // RESPONSE
+    // =====================
+
+    res.status(200).json({
+
+      token,
+
+      user: {
+        id: user.id,
+        email: user.email
+      }
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
+
+    res.status(500).json({
+
+      error:
+        "Login failed"
+
     });
   }
 };

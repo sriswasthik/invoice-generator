@@ -351,7 +351,7 @@ const styles = {
   },
 
   addBtn: {
-    background: "#4f46e5",
+    background: "#890054",
     color: "white",
     border: "none",
     padding: "14px",

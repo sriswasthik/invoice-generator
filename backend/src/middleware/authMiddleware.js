@@ -24,7 +24,7 @@ async function authMiddleware(req, res, next) {
     // verify token
     const decoded = jwt.verify(
       token,
-      "secret123"
+      process.env.JWT_SECRET
     );
 
     // attach user info
