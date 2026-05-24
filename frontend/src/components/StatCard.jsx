@@ -14,7 +14,7 @@ function StatCard({ title, value }) {
 
 const styles = {
     card: {
-        background: "white",
+        background: "var(--card)",
         padding: "18px",
         borderRadius: "12px",
         border: "1px solid #e2e8f0"

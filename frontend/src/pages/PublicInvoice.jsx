@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState }
+from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams }
+from "react-router-dom";
 
 import api from "../api/api";
 
@@ -21,9 +23,10 @@ function PublicInvoice() {
 
     try {
 
-      const res = await api.get(
-        `/invoices/public/${id}`
-      );
+      const res =
+        await api.get(
+          `/invoices/public/${id}`
+        );
 
       setInvoice(res.data);
 
@@ -36,82 +39,275 @@ function PublicInvoice() {
   if (!invoice) {
 
     return (
+
       <div style={styles.loading}>
         Loading invoice...
       </div>
+
     );
   }
 
+  const subtotal =
+    invoice.items?.reduce(
+      (sum, item) =>
+        sum +
+        (
+          Number(item.quantity || 1) *
+          Number(item.price || 0)
+        ),
+      0
+    );
+
+  const tax =
+    invoice.items?.reduce(
+      (sum, item) => {
+
+        const total =
+          Number(item.quantity || 1) *
+          Number(item.price || 0);
+
+        return (
+          sum +
+          (
+            total *
+            (
+              Number(
+                item.taxPercent || 0
+              ) / 100
+            )
+          )
+        );
+      },
+      0
+    );
+
+  const total =
+    subtotal + tax;
+
   return (
 
-    <div style={styles.container}>
+    <div style={styles.page}>
 
-      <div style={styles.card}>
+      <div style={styles.invoiceCard}>
 
-        <h1 style={styles.title}>
-          Invoice
-        </h1>
+        {/* TOP */}
 
-        <div style={styles.section}>
+        <div style={styles.topSection}>
 
-          <p>
-            <strong>
-              Invoice Number:
-            </strong>
-            {" "}
-            {invoice.invoiceNumber}
-          </p>
+          <div>
 
-          <p>
-            <strong>
-              Client:
-            </strong>
-            {" "}
-            {invoice.client?.name}
-          </p>
+            <div style={styles.logo}>
+              InvoiceOS
+            </div>
 
-          <p>
-            <strong>
-              Status:
-            </strong>
-            {" "}
+            <p style={styles.subText}>
+              Professional Invoice
+            </p>
+
+          </div>
+
+          <div
+            style={{
+              ...styles.status,
+              background:
+                invoice.status === "paid"
+                  ? "#dcfce7"
+                  : "#fee2e2",
+
+              color:
+                invoice.status === "paid"
+                  ? "#166534"
+                  : "#dc2626"
+            }}
+          >
+
             {invoice.status}
+
+          </div>
+
+        </div>
+
+        {/* TITLE */}
+
+        <div style={styles.header}>
+
+          <div>
+
+            <h1 style={styles.title}>
+              Invoice
+            </h1>
+
+            <p style={styles.invoiceNo}>
+              #{invoice.invoiceNumber}
+            </p>
+
+          </div>
+
+          <div style={styles.meta}>
+
+            <div>
+              <strong>
+                Issue Date
+              </strong>
+
+              <p>
+                {
+                  new Date(
+                    invoice.issueDate
+                  ).toLocaleDateString()
+                }
+              </p>
+
+            </div>
+
+            <div>
+
+              <strong>
+                Due Date
+              </strong>
+
+              <p>
+                {
+                  new Date(
+                    invoice.dueDate
+                  ).toLocaleDateString()
+                }
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* CLIENT */}
+
+        <div style={styles.clientCard}>
+
+          <h3 style={styles.sectionTitle}>
+            Billed To
+          </h3>
+
+          <h2 style={styles.clientName}>
+            {invoice.client?.name}
+          </h2>
+
+          <p style={styles.clientInfo}>
+            {invoice.client?.email}
           </p>
 
-          <p>
-            <strong>
-              Total:
-            </strong>
-            {" "}
-            ₹{invoice.totalAmount}
+          <p style={styles.clientInfo}>
+            {invoice.client?.phone}
+          </p>
+
+          <p style={styles.clientInfo}>
+            {invoice.client?.address}
           </p>
 
         </div>
 
-        <h3 style={styles.itemsTitle}>
-          Items
-        </h3>
+        {/* ITEMS */}
 
-        <div style={styles.items}>
+        <div style={styles.itemsSection}>
 
-          {invoice.items?.map((item) => (
+          <div style={styles.tableHeader}>
 
-            <div
-              key={item.id}
-              style={styles.item}
-            >
+            <div>Description</div>
+            <div>Qty</div>
+            <div>Price</div>
+            <div>Total</div>
+
+          </div>
+
+          {invoice.items?.map(
+            (item) => (
+
+              <div
+                key={item.id}
+                style={styles.itemRow}
+              >
+
+                <div>
+                  {
+                    item.description
+                  }
+                </div>
+
+                <div>
+                  {item.quantity}
+                </div>
+
+                <div>
+                  ₹{item.price}
+                </div>
+
+                <div>
+                  ₹{
+                    item.quantity *
+                    item.price
+                  }
+                </div>
+
+              </div>
+
+            )
+          )}
+
+        </div>
+
+        {/* TOTALS */}
+
+        <div style={styles.totalSection}>
+
+          <div style={styles.totalCard}>
+
+            <div style={styles.totalRow}>
 
               <span>
-                {item.description}
+                Subtotal
               </span>
 
               <strong>
-                ₹{item.amount}
+                ₹{subtotal}
               </strong>
 
             </div>
 
-          ))}
+            <div style={styles.totalRow}>
+
+              <span>
+                Tax
+              </span>
+
+              <strong>
+                ₹{tax}
+              </strong>
+
+            </div>
+
+            <div style={styles.divider} />
+
+            <div style={styles.finalRow}>
+
+              <span>
+                Total
+              </span>
+
+              <strong>
+                ₹{total}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* FOOTER */}
+
+        <div style={styles.footer}>
+
+          Thank you for your business.
 
         </div>
 
@@ -123,58 +319,168 @@ function PublicInvoice() {
 
 const styles = {
 
-  container: {
+  page: {
     minHeight: "100vh",
-    background: "#f8fafc",
+    background: "#eef2ff",
+    padding: "50px 20px",
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "30px"
+    justifyContent: "center"
   },
 
-  card: {
+  invoiceCard: {
     width: "100%",
-    maxWidth: "700px",
+    maxWidth: "960px",
     background: "white",
-    borderRadius: "20px",
-    padding: "40px",
-    border: "1px solid #e2e8f0"
+    borderRadius: "32px",
+    padding: "50px",
+    boxShadow:
+      "0 20px 60px rgba(0,0,0,0.08)"
+  },
+
+  topSection: {
+    display: "flex",
+    justifyContent:
+      "space-between",
+    alignItems: "center",
+    marginBottom: "40px"
+  },
+
+  logo: {
+    fontSize: "30px",
+    fontWeight: "800",
+    color: "#4f46e5"
+  },
+
+  subText: {
+    color: "#64748b",
+    marginTop: "6px"
+  },
+
+  status: {
+    padding: "10px 18px",
+    borderRadius: "999px",
+    fontWeight: "700",
+    textTransform: "capitalize"
+  },
+
+  header: {
+    display: "flex",
+    justifyContent:
+      "space-between",
+    alignItems: "flex-start",
+    marginBottom: "40px"
   },
 
   title: {
-    marginBottom: "30px"
+    fontSize: "52px",
+    fontWeight: "800",
+    marginBottom: "10px"
   },
 
-  section: {
+  invoiceNo: {
+    color: "#64748b",
+    fontSize: "16px"
+  },
+
+  meta: {
     display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-    marginBottom: "30px"
+    gap: "40px",
+    color: "#334155"
   },
 
-  itemsTitle: {
-    marginBottom: "16px"
-  },
-
-  items: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px"
-  },
-
-  item: {
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "14px",
+  clientCard: {
     background: "#f8fafc",
-    borderRadius: "10px"
+    borderRadius: "24px",
+    padding: "28px",
+    marginBottom: "40px"
+  },
+
+  sectionTitle: {
+    color: "#64748b",
+    marginBottom: "14px"
+  },
+
+  clientName: {
+    marginBottom: "10px"
+  },
+
+  clientInfo: {
+    color: "#475569",
+    marginBottom: "6px"
+  },
+
+  itemsSection: {
+    marginBottom: "40px"
+  },
+
+  tableHeader: {
+    display: "grid",
+    gridTemplateColumns:
+      "2fr 1fr 1fr 1fr",
+    padding: "16px 20px",
+    background: "#f1f5f9",
+    borderRadius: "16px",
+    fontWeight: "700",
+    marginBottom: "12px"
+  },
+
+  itemRow: {
+    display: "grid",
+    gridTemplateColumns:
+      "2fr 1fr 1fr 1fr",
+    padding: "18px 20px",
+    borderBottom:
+      "1px solid #e2e8f0",
+    alignItems: "center"
+  },
+
+  totalSection: {
+    display: "flex",
+    justifyContent: "flex-end"
+  },
+
+  totalCard: {
+    width: "360px",
+    background: "#f8fafc",
+    borderRadius: "24px",
+    padding: "28px"
+  },
+
+  totalRow: {
+    display: "flex",
+    justifyContent:
+      "space-between",
+    marginBottom: "18px",
+    color: "#475569"
+  },
+
+  divider: {
+    height: "1px",
+    background: "#dbe3ec",
+    margin: "20px 0"
+  },
+
+  finalRow: {
+    display: "flex",
+    justifyContent:
+      "space-between",
+    fontSize: "28px",
+    fontWeight: "800"
+  },
+
+  footer: {
+    marginTop: "50px",
+    textAlign: "center",
+    color: "#64748b",
+    fontSize: "15px"
   },
 
   loading: {
     height: "100vh",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    fontSize: "18px"
   }
 
 };

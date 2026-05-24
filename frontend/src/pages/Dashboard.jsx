@@ -8,59 +8,73 @@ import AnalyticsChart from "../components/AnalyticsChart";
 
 function Dashboard() {
 
-  const [invoices, setInvoices] = useState([]);
+  const [invoices, setInvoices] =
+    useState([]);
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] =
+    useState("");
 
-  const [statusFilter, setStatusFilter] =
+  const [statusFilter,
+    setStatusFilter] =
     useState("all");
 
   useEffect(() => {
     fetchInvoices();
   }, []);
 
-  const fetchInvoices = async () => {
+  const fetchInvoices =
+    async () => {
 
-    try {
+      try {
 
-      const res = await api.get("/invoices");
+        const res =
+          await api.get("/invoices");
 
-      setInvoices(res.data);
+        setInvoices(res.data);
 
-    } catch (error) {
+      } catch (error) {
 
-      console.error(error);
-    }
-  };
+        console.error(error);
+      }
+    };
 
   // =========================
   // ANALYTICS
   // =========================
 
-  const totalRevenue = invoices.reduce(
-    (sum, inv) =>
-      sum + (inv.totalAmount || 0),
-    0
-  );
+  const totalRevenue =
+    invoices.reduce(
+      (sum, inv) =>
+        sum +
+        (inv.totalAmount || 0),
+      0
+    );
 
-  const paidInvoices = invoices.filter(
-    (inv) => inv.status === "paid"
-  );
+  const paidInvoices =
+    invoices.filter(
+      (inv) =>
+        inv.status === "paid"
+    );
 
-  const pendingInvoices = invoices.filter(
-    (inv) => inv.status !== "paid"
-  );
+  const pendingInvoices =
+    invoices.filter(
+      (inv) =>
+        inv.status !== "paid"
+    );
 
-  const totalPaid = paidInvoices.reduce(
-    (sum, inv) =>
-      sum + (inv.totalAmount || 0),
-    0
-  );
+  const totalPaid =
+    paidInvoices.reduce(
+      (sum, inv) =>
+        sum +
+        (inv.totalAmount || 0),
+      0
+    );
 
   const totalPending =
     pendingInvoices.reduce(
       (sum, inv) =>
-        sum + (inv.totalAmount || 0),
+        sum +
+        (inv.totalAmount || 0),
       0
     );
 
@@ -68,15 +82,17 @@ function Dashboard() {
   // FILTERS
   // =========================
 
-  const filteredInvoices = invoices.filter(
-    (inv) => {
+  const filteredInvoices =
+    invoices.filter((inv) => {
 
       const matchesSearch =
+
         inv.invoiceNumber
           ?.toLowerCase()
           .includes(
             search.toLowerCase()
           ) ||
+
         inv.client?.name
           ?.toLowerCase()
           .includes(
@@ -84,32 +100,50 @@ function Dashboard() {
           );
 
       const matchesStatus =
+
         statusFilter === "all" ||
+
         inv.status === statusFilter;
 
       return (
         matchesSearch &&
         matchesStatus
       );
-    }
-  );
+    });
 
   return (
 
-    <div style={styles.wrapper}>
+    <div style={styles.page}>
 
-      {/* HEADER */}
+      {/* HERO */}
 
-      <div style={styles.header}>
+      <div style={styles.hero}>
 
         <div>
 
-          <h2>Dashboard</h2>
-
-          <p style={styles.subtext}>
-            Overview of your invoices
-            and payments
+          <p style={styles.welcome}>
+            Welcome Back 👋
           </p>
+
+          <h1 style={styles.heading}>
+            Financial Dashboard
+          </h1>
+
+          <p style={styles.heroText}>
+            Monitor invoices,
+            revenue and payments
+            in one place.
+          </p>
+
+        </div>
+
+        <div style={styles.heroBadge}>
+
+          <div
+            style={styles.badgeDot}
+          />
+
+          Active Business
 
         </div>
 
@@ -119,84 +153,144 @@ function Dashboard() {
 
       <div style={styles.statsGrid}>
 
-        <div style={styles.statCard}>
-          <p style={styles.statLabel}>
+        <div style={styles.primaryCard}>
+
+          <p style={styles.cardLabel}>
             Total Revenue
           </p>
 
-          <h2>
+          <h2 style={styles.bigAmount}>
             ₹{totalRevenue}
           </h2>
+
+          <p style={styles.cardSub}>
+            Across all invoices
+          </p>
+
         </div>
 
         <div style={styles.statCard}>
-          <p style={styles.statLabel}>
+
+          <p style={styles.cardLabel}>
             Paid Revenue
           </p>
 
-          <h2>
+          <h2 style={styles.amount}>
             ₹{totalPaid}
           </h2>
+
         </div>
 
         <div style={styles.statCard}>
-          <p style={styles.statLabel}>
+
+          <p style={styles.cardLabel}>
             Pending Revenue
           </p>
 
-          <h2>
+          <h2 style={styles.amount}>
             ₹{totalPending}
           </h2>
+
         </div>
 
         <div style={styles.statCard}>
-          <p style={styles.statLabel}>
-            Invoices
+
+          <p style={styles.cardLabel}>
+            Total Invoices
           </p>
 
-          <h2>
+          <h2 style={styles.amount}>
             {invoices.length}
           </h2>
+
         </div>
 
       </div>
 
       {/* INSIGHTS */}
 
-      <div style={styles.insights}>
+      <div style={styles.insightGrid}>
 
         <div style={styles.insightCard}>
 
-          <h3>Collection Rate</h3>
+          <div>
 
-          <p style={styles.bigText}>
+            <p style={styles.cardLabel}>
+              Collection Rate
+            </p>
 
-            {
-              invoices.length
-                ? Math.round(
-                  (paidInvoices.length /
-                    invoices.length) * 100
-                )
-                : 0
-            }%
+            <h2 style={styles.insightNumber}>
 
-          </p>
+              {
+                invoices.length
+
+                  ? Math.round(
+                    (
+                      paidInvoices.length /
+                      invoices.length
+                    ) * 100
+                  )
+
+                  : 0
+              }%
+
+            </h2>
+
+          </div>
+
+          <div style={styles.iconBox}>
+            📈
+          </div>
 
         </div>
 
         <div style={styles.insightCard}>
 
-          <h3>Pending Invoices</h3>
+          <div>
 
-          <p style={styles.bigText}>
-            {pendingInvoices.length}
-          </p>
+            <p style={styles.cardLabel}>
+              Pending Invoices
+            </p>
+
+            <h2 style={styles.insightNumber}>
+              {pendingInvoices.length}
+            </h2>
+
+          </div>
+
+          <div style={styles.iconBox}>
+            ⏳
+          </div>
 
         </div>
 
       </div>
 
-      <AnalyticsChart invoices={invoices} />
+      {/* CHART */}
+
+      <div style={styles.chartCard}>
+
+        <div style={styles.chartHeader}>
+
+          <div>
+
+            <h2>
+              Revenue Analytics
+            </h2>
+
+            <p style={styles.chartSub}>
+              Invoice revenue overview
+            </p>
+
+          </div>
+
+        </div>
+
+        <AnalyticsChart
+          invoices={invoices}
+        />
+
+      </div>
 
       {/* FILTERS */}
 
@@ -206,7 +300,9 @@ function Dashboard() {
           placeholder="Search invoices or clients..."
           value={search}
           onChange={(e) =>
-            setSearch(e.target.value)
+            setSearch(
+              e.target.value
+            )
           }
           style={styles.search}
         />
@@ -222,7 +318,7 @@ function Dashboard() {
         >
 
           <option value="all">
-            All
+            All Status
           </option>
 
           <option value="paid">
@@ -241,41 +337,62 @@ function Dashboard() {
 
       </div>
 
-      {/* INVOICE SECTION */}
+      {/* RECENT */}
 
       <div style={styles.sectionHeader}>
 
-        <h3>Recent Invoices</h3>
+        <div>
 
-        <span style={styles.count}>
+          <h2>
+            Recent Invoices
+          </h2>
+
+          <p style={styles.sectionSub}>
+            Latest invoice activity
+          </p>
+
+        </div>
+
+        <div style={styles.countBadge}>
           {filteredInvoices.length}
-          {" "}items
-        </span>
+          {" "}Invoices
+        </div>
 
       </div>
 
-      {filteredInvoices.length === 0 && (
+      {filteredInvoices.length === 0 ? (
 
-        <p style={{ color: "#64748b" }}>
-          No invoices found
-        </p>
+        <div style={styles.emptyState}>
+
+          <h3>
+            No Invoices Found
+          </h3>
+
+          <p>
+            Create invoices to start
+            tracking revenue.
+          </p>
+
+        </div>
+
+      ) : (
+
+        <div style={styles.invoiceGrid}>
+
+          {filteredInvoices.map(
+            (invoice) => (
+
+              <InvoiceCard
+                key={invoice.id}
+                invoice={invoice}
+              />
+
+            )
+          )}
+
+        </div>
 
       )}
-
-      <div style={styles.invoiceGrid}>
-
-        {filteredInvoices.map(
-          (invoice) => (
-
-            <InvoiceCard
-              key={invoice.id}
-              invoice={invoice}
-            />
-
-          )
-        )}
-
-      </div>
 
     </div>
   );
@@ -283,104 +400,219 @@ function Dashboard() {
 
 const styles = {
 
-  wrapper: {
+  page: {
     width: "100%"
   },
 
-  header: {
-    marginBottom: "30px"
+  hero: {
+    background:
+      "linear-gradient(135deg, #4c0505, #7650a7)",
+    borderRadius: "28px",
+    padding: "36px",
+    color: "white",
+    display: "flex",
+    justifyContent:
+      "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
+    boxShadow:
+      "0 10px 40px rgba(79,70,229,0.25)"
   },
 
-  subtext: {
-    color: "#64748b",
-    marginTop: "6px"
+  welcome: {
+    opacity: 0.9,
+    marginBottom: "10px"
+  },
+
+  heading: {
+    fontSize: "42px",
+    fontWeight: "800",
+    marginBottom: "10px"
+  },
+
+  heroText: {
+    opacity: 0.9,
+    maxWidth: "500px",
+    lineHeight: 1.6
+  },
+
+  heroBadge: {
+    background:
+      "rgba(255,255,255,0.18)",
+    padding: "12px 18px",
+    borderRadius: "999px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    fontWeight: "600"
+  },
+
+  badgeDot: {
+    width: "10px",
+    height: "10px",
+    borderRadius: "50%",
+    background: "#22c55e"
   },
 
   statsGrid: {
     display: "grid",
     gridTemplateColumns:
-      "repeat(auto-fit, minmax(220px, 1fr))",
+      "2fr 1fr 1fr 1fr",
     gap: "20px",
-    marginBottom: "30px"
+    marginBottom: "24px"
+  },
+
+  primaryCard: {
+    background: "#111827",
+    color: "white",
+    borderRadius: "24px",
+    padding: "28px",
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.08)"
   },
 
   statCard: {
     background: "white",
-    padding: "24px",
-    borderRadius: "18px",
+    borderRadius: "24px",
+    padding: "28px",
     border: "1px solid #e2e8f0",
     boxShadow:
-      "0 4px 14px rgba(0,0,0,0.04)"
+      "0 8px 24px rgba(0,0,0,0.04)"
   },
 
-  statLabel: {
+  cardLabel: {
     color: "#64748b",
-    marginBottom: "10px",
-    fontSize: "14px"
+    fontSize: "14px",
+    marginBottom: "12px"
   },
 
-  insights: {
+  bigAmount: {
+    fontSize: "40px",
+    fontWeight: "800"
+  },
+
+  amount: {
+    fontSize: "30px",
+    fontWeight: "700"
+  },
+
+  cardSub: {
+    marginTop: "12px",
+    color: "#cbd5e1"
+  },
+
+  insightGrid: {
     display: "grid",
     gridTemplateColumns:
-      "repeat(auto-fit, minmax(260px, 1fr))",
+      "1fr 1fr",
     gap: "20px",
-    marginBottom: "30px"
+    marginBottom: "28px"
   },
 
   insightCard: {
     background: "white",
-    padding: "24px",
-    borderRadius: "18px",
-    border: "1px solid #e2e8f0"
+    borderRadius: "24px",
+    padding: "28px",
+    border: "1px solid #e2e8f0",
+    display: "flex",
+    justifyContent:
+      "space-between",
+    alignItems: "center",
+    boxShadow:
+      "0 8px 24px rgba(0,0,0,0.04)"
   },
 
-  bigText: {
+  insightNumber: {
     fontSize: "42px",
-    fontWeight: "700",
-    marginTop: "10px"
+    fontWeight: "800"
+  },
+
+  iconBox: {
+    fontSize: "42px"
+  },
+
+  chartCard: {
+    background: "white",
+    borderRadius: "28px",
+    padding: "30px",
+    border: "1px solid #e2e8f0",
+    marginBottom: "30px",
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.04)"
+  },
+
+  chartHeader: {
+    marginBottom: "20px"
+  },
+
+  chartSub: {
+    color: "#64748b",
+    marginTop: "6px"
   },
 
   toolbar: {
     display: "flex",
-    gap: "14px",
-    marginBottom: "30px",
+    gap: "16px",
+    marginBottom: "28px",
     flexWrap: "wrap"
   },
 
   search: {
     flex: 1,
-    minWidth: "240px",
-    padding: "12px",
-    borderRadius: "10px",
-    border: "1px solid #e2e8f0",
-    background: "white"
+    minWidth: "260px",
+    padding: "16px",
+    borderRadius: "14px",
+    border: "1px solid #dbe3ec",
+    background: "white",
+    outline: "none",
+    fontSize: "15px"
   },
 
   filter: {
-    padding: "12px",
-    borderRadius: "10px",
-    border: "1px solid #e2e8f0",
-    background: "white"
+    padding: "16px",
+    borderRadius: "14px",
+    border: "1px solid #dbe3ec",
+    background: "white",
+    minWidth: "180px",
+    outline: "none",
+    fontSize: "15px"
   },
 
   sectionHeader: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent:
+      "space-between",
     alignItems: "center",
-    marginBottom: "20px"
+    marginBottom: "24px"
   },
 
-  count: {
+  sectionSub: {
     color: "#64748b",
-    fontSize: "14px"
+    marginTop: "6px"
+  },
+
+  countBadge: {
+    background: "#eef2ff",
+    color: "#4338ca",
+    padding: "10px 16px",
+    borderRadius: "12px",
+    fontWeight: "600"
   },
 
   invoiceGrid: {
     display: "grid",
     gridTemplateColumns:
       "repeat(auto-fit, minmax(340px, 1fr))",
-    gap: "24px",
-    width: "100%"
+    gap: "24px"
+  },
+
+  emptyState: {
+    background: "white",
+    borderRadius: "28px",
+    padding: "60px",
+    textAlign: "center",
+    border: "1px solid #e2e8f0",
+    color: "#64748b"
   }
 
 };

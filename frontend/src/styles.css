@@ -8,7 +8,7 @@
   --sidebar: #0f172a;
 
   --background: #f8fafc;
-  --card: #ffffff;
+  --card: "var(--card)";
 
   --text-main: #0f172a;
   --text-muted: #64748b;
@@ -93,7 +93,7 @@ input, select {
 /* Card style */
 
 .card {
-  background: white;
+  background: var(--card);
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 15px;
@@ -136,4 +136,73 @@ input:focus, select:focus {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+
+  font-family:
+    Inter,
+    sans-serif;
+
+  background: var(--bg);
+
+  color: var(--text);
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+/* =========================
+   LIGHT THEME
+========================= */
+
+:root {
+
+  --bg: #f8fafc;
+
+  --card: #ffffff;
+
+  --sidebar: #0f172a;
+
+  --text: #0f172a;
+
+  --subtext: #64748b;
+
+  --border: #e2e8f0;
+
+  --primary: #4f46e5;
+
+  --hover: #eef2ff;
+}
+
+/* =========================
+   DARK THEME
+========================= */
+
+.dark {
+
+  --bg: #0f172a;
+
+  --card: #111827;
+
+  --sidebar: #020617;
+
+  --text: #f8fafc;
+
+  --subtext: #94a3b8;
+
+  --border: #1f2937;
+
+  --primary: #6366f1;
+
+  --hover: #1e293b;
+
+  --card-hover: #172033;
 }

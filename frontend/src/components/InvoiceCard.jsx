@@ -120,7 +120,7 @@ function InvoiceCard({ invoice }) {
 
 const styles = {
   card: {
-    background: "white",
+    background: "var(--card)",
     borderRadius: "14px",
     padding: "20px",
     border: "1px solid #e2e8f0",
@@ -128,7 +128,7 @@ const styles = {
   },
 
   shareBtn: {
-  background: "#0f172a",
+  background: "var(--sidebar)",
   color: "white",
   border: "none",
   padding: "10px 14px",

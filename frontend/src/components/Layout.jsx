@@ -1,6 +1,12 @@
 import { useAuth } from "../context/AuthContext";
+import { useTheme }
+  from "../context/ThemeContext";
 
 function Layout({ page, setPage, children }) {
+  const {
+    darkMode,
+    toggleTheme
+  } = useTheme();
 
   const { user, logout } = useAuth();
 
@@ -57,6 +63,16 @@ function Layout({ page, setPage, children }) {
             >
               Create Invoice
             </div>
+            <button
+              style={styles.themeBtn}
+              onClick={toggleTheme}
+            >
+
+              {darkMode
+                ? "Light"
+                : "Dark"}
+
+            </button>
 
           </nav>
 
@@ -124,6 +140,25 @@ function Layout({ page, setPage, children }) {
 
 const styles = {
 
+  themeBtn: {
+
+  // marginLeft: "auto",
+
+  background: "var(--primary)",
+
+  color: "white",
+
+  border: "none",
+
+  padding: "10px 16px",
+
+  borderRadius: "10px",
+
+  cursor: "pointer",
+
+  fontWeight: "600"
+},
+
   container: {
     display: "flex",
     minHeight: "100vh",
@@ -132,7 +167,7 @@ const styles = {
 
   sidebar: {
     width: "240px",
-    background: "#0f172a",
+    background: "var(--sidebar)",
     color: "white",
     padding: "24px 18px",
     display: "flex",

@@ -72,7 +72,7 @@ function AnalyticsChart({ invoices }) {
 const styles = {
 
   card: {
-    background: "white",
+    background: "var(--card)",
     borderRadius: "20px",
     padding: "24px",
     border: "1px solid #e2e8f0",
