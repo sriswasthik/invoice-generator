@@ -1,19 +1,44 @@
-const { PrismaClient } = require("@prisma/client");
+const {
+  PrismaClient
+} = require(
+  "@prisma/client"
+);
 
-const prisma = new PrismaClient();
+// =====================================
+// PRISMA CLIENT
+// =====================================
 
-module.exports = prisma;
+const globalForPrisma =
+  global;
 
-// const { PrismaClient } = require("@prisma/client");
-// const Database = require("better-sqlite3");
-// const PrismaBetterSQLite3 = require("@prisma/adapter-better-sqlite3").default;
+// Prevent multiple Prisma instances
+// during development hot reload
 
-// const db = new Database("./prisma/dev.db");
+const prisma =
+  globalForPrisma.prisma ||
 
-// const adapter = new PrismaBetterSQLite3(db);
+  new PrismaClient({
 
-// const prisma = new PrismaClient({
-//   adapter
-// });
+    log: [
 
-// module.exports = prisma;
+      "error",
+
+      "warn"
+
+    ]
+
+  });
+
+// Save instance globally in dev
+
+if (
+  process.env.NODE_ENV !==
+  "production"
+) {
+
+  globalForPrisma.prisma =
+    prisma;
+}
+
+module.exports =
+  prisma;

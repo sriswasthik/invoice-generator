@@ -1,218 +1,561 @@
-// const PDFDocument = require("pdfkit");
+const PDFDocument =
+  require("pdfkit");
 
-// function generateInvoicePDF(invoice, res) {
+// =====================================
+// PDF GENERATOR
+// =====================================
 
-//   const doc = new PDFDocument({ margin: 50 });
+function generateInvoicePDF(
+  invoice,
+  res
+) {
 
-//   res.setHeader("Content-Type", "application/pdf");
-//   res.setHeader(
-//     "Content-Disposition",
-//     `attachment; filename=invoice-${invoice.invoiceNumber}.pdf`
-//   );
+  const doc =
+    new PDFDocument({
 
-//   doc.pipe(res);
+      margin: 50,
 
-//   // ===== HEADER =====
-//   doc
-//     .fontSize(20)
-//     .text("Your Business Name", { align: "left" });
+      size: "A4"
 
-//   doc
-//     .fontSize(10)
-//     .text("Your Address Line", { align: "left" })
-//     .text("GSTIN: XXXXXXXX");
+    });
 
-//   doc.moveUp();
+  // =====================================
+  // RESPONSE HEADERS
+  // =====================================
 
-//   doc
-//     .fontSize(20)
-//     .text("INVOICE", { align: "right" });
-
-//   doc.moveDown(2);
-
-//   // ===== CLIENT + INVOICE INFO =====
-//   doc.fontSize(12);
-
-//   doc.text("Bill To:", { continued: true });
-//   doc.text(` ${invoice.client.name}`);
-
-//   doc.text(invoice.client.address || "");
-//   doc.text(invoice.client.email || "");
-
-//   doc.moveUp();
-
-//   doc.text(`Invoice #: ${invoice.invoiceNumber}`, { align: "right" });
-//   doc.text(`Issue Date: ${new Date(invoice.issueDate).toDateString()}`, { align: "right" });
-//   doc.text(`Due Date: ${new Date(invoice.dueDate).toDateString()}`, { align: "right" });
-
-//   doc.moveDown(2);
-
-//   // ===== TABLE HEADER =====
-//   const tableTop = doc.y;
-
-//   doc.fontSize(12).text("Description", 50, tableTop);
-//   doc.text("Qty", 250, tableTop);
-//   doc.text("Price", 300, tableTop);
-//   doc.text("Total", 400, tableTop);
-
-//   doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
-
-//   let position = tableTop + 25;
-
-//   // ===== TABLE ROWS =====
-//   invoice.items.forEach((item) => {
-
-//     const total = item.quantity * item.price;
-
-//     doc.text(item.description, 50, position);
-//     doc.text(item.quantity.toString(), 250, position);
-//     doc.text(`₹${item.price}`, 300, position);
-//     doc.text(`₹${total}`, 400, position);
-
-//     position += 25;
-//   });
-
-//   doc.moveDown(2);
-
-//   // ===== TOTALS =====
-//   const totalsY = position + 20;
-
-//   doc.text(`Subtotal: ₹${invoice.totalAmount - invoice.taxAmount}`, 350, totalsY);
-//   doc.text(`Tax: ₹${invoice.taxAmount}`, 350, totalsY + 20);
-
-//   doc
-//     .font("Helvetica-Bold")
-//     .text(`Total: ₹${invoice.totalAmount}`, 350, totalsY + 40);
-
-//   doc.font("Helvetica");
-
-//   // ===== FOOTER =====
-//   doc.moveDown(4);
-
-//   doc
-//     .fontSize(10)
-//     .text("Thank you for your business!", { align: "center" });
-
-//   doc.end();
-// }
-
-// module.exports = generateInvoicePDF;
-
-
-const PDFDocument = require("pdfkit");
-
-function generateInvoicePDF(invoice, res) {
-
-  const doc = new PDFDocument({ margin: 50 });
-
-  res.setHeader("Content-Type", "application/pdf");
   res.setHeader(
+    "Content-Type",
+    "application/pdf"
+  );
+
+  res.setHeader(
+
     "Content-Disposition",
+
     `attachment; filename=invoice-${invoice.invoiceNumber}.pdf`
   );
 
   doc.pipe(res);
 
-  // ===== TOP COLOR BAR =====
+  // =====================================
+  // COLORS
+  // =====================================
+
+  const primary =
+    "#4f46e5";
+
+  const textDark =
+    "#0f172a";
+
+  const textMuted =
+    "#64748b";
+
+  const border =
+    "#e2e8f0";
+
+  const bgLight =
+    "#f8fafc";
+
+  // =====================================
+  // TOP HEADER
+  // =====================================
+
   doc
-    .rect(0, 0, doc.page.width, 60)
-    .fill("#5b5bd6");
+    .rect(
+      0,
+      0,
+      doc.page.width,
+      90
+    )
+    .fill(primary);
 
   doc
     .fillColor("white")
-    .fontSize(20)
-    .text("INVOICE", 50, 20);
 
-  doc.fillColor("black");
+    .fontSize(28)
 
-  doc.moveDown(2);
+    .font("Helvetica-Bold")
 
-  // ===== BUSINESS INFO =====
+    .text(
+      "INVOICE",
+      50,
+      28
+    );
+
   doc
+    .fontSize(11)
+
+    .font("Helvetica")
+
+    .text(
+      "Professional Invoice Document",
+      50,
+      62
+    );
+
+  // =====================================
+  // BUSINESS INFO
+  // =====================================
+
+  doc.fillColor(
+    textDark
+  );
+
+  doc
+    .fontSize(18)
+
+    .font("Helvetica-Bold")
+
+    .text(
+      "InvoiceOS",
+      50,
+      120
+    );
+
+  doc
+    .fontSize(10)
+
+    .font("Helvetica")
+
+    .fillColor(
+      textMuted
+    )
+
+    .text(
+      "Modern Invoice Platform",
+      50,
+      145
+    )
+
+    .text(
+      "Hyderabad, India",
+      50,
+      160
+    )
+
+    .text(
+      "support@invoiceos.com",
+      50,
+      175
+    );
+
+  // =====================================
+  // INVOICE META
+  // =====================================
+
+  doc
+    .fillColor(
+      textDark
+    )
+
+    .fontSize(10)
+
+    .font("Helvetica-Bold")
+
+    .text(
+      "Invoice Number",
+      380,
+      120
+    )
+
+    .font("Helvetica")
+
+    .fillColor(
+      textMuted
+    )
+
+    .text(
+      invoice.invoiceNumber,
+      380,
+      136
+    );
+
+  doc
+    .fillColor(
+      textDark
+    )
+
+    .font("Helvetica-Bold")
+
+    .text(
+      "Issue Date",
+      380,
+      160
+    )
+
+    .font("Helvetica")
+
+    .fillColor(
+      textMuted
+    )
+
+    .text(
+
+      new Date(
+        invoice.issueDate
+      ).toDateString(),
+
+      380,
+      176
+    );
+
+  doc
+    .fillColor(
+      textDark
+    )
+
+    .font("Helvetica-Bold")
+
+    .text(
+      "Due Date",
+      380,
+      200
+    )
+
+    .font("Helvetica")
+
+    .fillColor(
+      textMuted
+    )
+
+    .text(
+
+      new Date(
+        invoice.dueDate
+      ).toDateString(),
+
+      380,
+      216
+    );
+
+  // =====================================
+  // CLIENT SECTION
+  // =====================================
+
+  doc
+    .roundedRect(
+      50,
+      260,
+      500,
+      100,
+      12
+    )
+    .fill(bgLight);
+
+  doc
+    .fillColor(
+      textDark
+    )
+
+    .fontSize(12)
+
+    .font("Helvetica-Bold")
+
+    .text(
+      "Billed To",
+      70,
+      280
+    );
+
+  doc
+    .fontSize(16)
+
+    .text(
+      invoice.client.name,
+      70,
+      305
+    );
+
+  doc
+    .font("Helvetica")
+
+    .fontSize(10)
+
+    .fillColor(
+      textMuted
+    )
+
+    .text(
+      invoice.client.email || "",
+      70,
+      332
+    )
+
+    .text(
+      invoice.client.address || "",
+      70,
+      348
+    );
+
+  // =====================================
+  // TABLE HEADER
+  // =====================================
+
+  const tableTop = 410;
+
+  doc
+    .roundedRect(
+      50,
+      tableTop,
+      500,
+      36,
+      8
+    )
+    .fill(primary);
+
+  doc
+    .fillColor("white")
+
+    .font("Helvetica-Bold")
+
+    .fontSize(11)
+
+    .text(
+      "Description",
+      70,
+      tableTop + 12
+    )
+
+    .text(
+      "Qty",
+      300,
+      tableTop + 12
+    )
+
+    .text(
+      "Price",
+      370,
+      tableTop + 12
+    )
+
+    .text(
+      "Amount",
+      460,
+      tableTop + 12
+    );
+
+  // =====================================
+  // TABLE ROWS
+  // =====================================
+
+  let position =
+    tableTop + 50;
+
+  invoice.items.forEach(
+    (item, index) => {
+
+      const amount =
+        item.quantity *
+        item.price;
+
+      // row bg
+      doc
+        .roundedRect(
+          50,
+          position - 8,
+          500,
+          34,
+          6
+        )
+        .fill(
+          index % 2 === 0
+            ? "#ffffff"
+            : "#f8fafc"
+        );
+
+      doc
+        .fillColor(
+          textDark
+        )
+
+        .fontSize(10)
+
+        .font("Helvetica")
+
+        .text(
+          item.description,
+          70,
+          position
+        )
+
+        .text(
+          item.quantity.toString(),
+          300,
+          position
+        )
+
+        .text(
+          `₹${item.price}`,
+          370,
+          position
+        )
+
+        .text(
+          `₹${amount}`,
+          460,
+          position
+        );
+
+      position += 42;
+    }
+  );
+
+  // =====================================
+  // TOTAL CARD
+  // =====================================
+
+  const totalBoxY =
+    position + 35;
+
+  doc
+    .roundedRect(
+      320,
+      totalBoxY,
+      230,
+      120,
+      16
+    )
+    .fill(bgLight);
+
+  const subtotal =
+    invoice.totalAmount -
+    invoice.taxAmount;
+
+  doc
+    .fillColor(
+      textMuted
+    )
+
+    .fontSize(11)
+
+    .font("Helvetica")
+
+    .text(
+      "Subtotal",
+      340,
+      totalBoxY + 20
+    )
+
+    .text(
+      `₹${subtotal}`,
+      470,
+      totalBoxY + 20
+    );
+
+  doc
+    .text(
+      "Tax",
+      340,
+      totalBoxY + 48
+    )
+
+    .text(
+      `₹${invoice.taxAmount}`,
+      470,
+      totalBoxY + 48
+    );
+
+  doc
+    .moveTo(
+      340,
+      totalBoxY + 78
+    )
+
+    .lineTo(
+      520,
+      totalBoxY + 78
+    )
+
+    .strokeColor(border)
+
+    .stroke();
+
+  doc
+    .fillColor(
+      textDark
+    )
+
+    .font("Helvetica-Bold")
+
     .fontSize(14)
-    .font("Helvetica-Bold")
-    .text("Your Business Name", 50, 80);
+
+    .text(
+      "Total",
+      340,
+      totalBoxY + 90
+    )
+
+    .text(
+      `₹${invoice.totalAmount}`,
+      460,
+      totalBoxY + 90
+    );
+
+  // =====================================
+  // STATUS BADGE
+  // =====================================
+
+  const badgeColor =
+    invoice.status === "paid"
+      ? "#22c55e"
+      : invoice.status ===
+        "partial"
+      ? "#f59e0b"
+      : "#64748b";
 
   doc
+    .roundedRect(
+      50,
+      totalBoxY + 20,
+      110,
+      36,
+      18
+    )
+    .fill(
+      badgeColor
+    );
+
+  doc
+    .fillColor("white")
+
+    .font("Helvetica-Bold")
+
+    .fontSize(11)
+
+    .text(
+      invoice.status.toUpperCase(),
+      76,
+      totalBoxY + 33
+    );
+
+  // =====================================
+  // FOOTER
+  // =====================================
+
+  doc
+    .fillColor(
+      textMuted
+    )
+
+    .fontSize(10)
+
     .font("Helvetica")
-    .fontSize(10)
-    .text("Address Line", 50, 100)
-    .text("GSTIN: XXXXXXXX", 50, 115);
 
-  // ===== INVOICE INFO RIGHT =====
-  doc
-    .fontSize(10)
-    .text(`Invoice #: ${invoice.invoiceNumber}`, 400, 80)
-    .text(`Date: ${new Date(invoice.issueDate).toDateString()}`, 400, 95)
-    .text(`Due: ${new Date(invoice.dueDate).toDateString()}`, 400, 110);
+    .text(
 
-  doc.moveDown(3);
+      "Thank you for your business.",
 
-  // ===== CLIENT =====
-  doc
-    .font("Helvetica-Bold")
-    .text("Bill To:", 50, 150);
+      50,
 
-  doc
-    .font("Helvetica")
-    .text(invoice.client.name, 50, 165)
-    .text(invoice.client.address || "", 50, 180)
-    .text(invoice.client.email || "", 50, 195);
+      760,
 
-  // ===== TABLE HEADER =====
-  const tableTop = 240;
-
-  doc
-    .font("Helvetica-Bold")
-    .text("Description", 50, tableTop)
-    .text("Qty", 250, tableTop)
-    .text("Price", 320, tableTop)
-    .text("Total", 420, tableTop);
-
-  doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
-
-  let position = tableTop + 25;
-
-  // ===== TABLE ROWS =====
-  doc.font("Helvetica");
-
-  invoice.items.forEach((item) => {
-
-    const total = item.quantity * item.price;
-
-    doc.text(item.description, 50, position);
-    doc.text(item.quantity.toString(), 250, position);
-    doc.text(`₹${item.price}`, 320, position);
-    doc.text(`₹${total}`, 420, position);
-
-    position += 25;
-  });
-
-  // ===== TOTAL BOX =====
-  const boxY = position + 30;
-
-  doc
-    .rect(300, boxY, 250, 90)
-    .fill("#f1f5f9");
-
-  doc.fillColor("black");
-
-  doc.text(`Subtotal: ₹${invoice.totalAmount - invoice.taxAmount}`, 320, boxY + 15);
-  doc.text(`Tax: ₹${invoice.taxAmount}`, 320, boxY + 35);
-
-  doc
-    .font("Helvetica-Bold")
-    .text(`Total: ₹${invoice.totalAmount}`, 320, boxY + 60);
-
-  doc.font("Helvetica");
-
-  // ===== FOOTER =====
-  doc
-    .fontSize(10)
-    .fillColor("#64748b")
-    .text("Thank you for your business!", 50, 700, { align: "center" });
+      {
+        align: "center"
+      }
+    );
 
   doc.end();
 }
 
-module.exports = generateInvoicePDF;
+module.exports =
+  generateInvoicePDF;

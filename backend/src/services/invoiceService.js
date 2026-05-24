@@ -1,40 +1,163 @@
-// backend/src/services/invoiceService.js
+// =====================================
+// HELPERS
+// =====================================
 
-function calculateInvoiceTotals(items) {
+function toNumber(value) {
+
+  const number =
+    Number(value);
+
+  return isNaN(number)
+    ? 0
+    : number;
+}
+
+function round(value) {
+
+  return Number(
+    value.toFixed(2)
+  );
+}
+
+// =====================================
+// CALCULATE TOTALS
+// =====================================
+
+function calculateInvoiceTotals(
+  items = []
+) {
+
+  // =====================
+  // VALIDATION
+  // =====================
+
+  if (
+    !Array.isArray(items)
+  ) {
+
+    throw new Error(
+      "Items must be an array"
+    );
+  }
+
   let subtotal = 0;
+
   let totalTax = 0;
 
-  const processedItems = items.map((item) => {
-    const quantity = Number(item.quantity);
-    const price = Number(item.price);
-    const taxPercent = Number(item.taxPercent);
+  // =====================
+  // PROCESS ITEMS
+  // =====================
 
-    const itemTotal = quantity * price;
-    const itemTax = itemTotal * (taxPercent / 100);
+  const processedItems =
+    items.map((item) => {
 
-    subtotal += itemTotal;
-    totalTax += itemTax;
+      const quantity =
+        toNumber(
+          item.quantity
+        );
 
-    return {
-      description: item.description,
-      quantity,
-      price,
-      taxPercent,
-      itemTotal,
-      itemTax
-    };
-  });
+      const price =
+        toNumber(
+          item.price
+        );
 
-  const grandTotal = subtotal + totalTax;
+      const taxPercent =
+        toNumber(
+          item.taxPercent
+        );
+
+      const description =
+        item.description
+          ?.trim() || "";
+
+      // =====================
+      // ITEM CALCULATIONS
+      // =====================
+
+      const itemSubtotal =
+        quantity * price;
+
+      const itemTax =
+        itemSubtotal *
+        (taxPercent / 100);
+
+      const itemTotal =
+        itemSubtotal +
+        itemTax;
+
+      // =====================
+      // GLOBAL TOTALS
+      // =====================
+
+      subtotal +=
+        itemSubtotal;
+
+      totalTax +=
+        itemTax;
+
+      // =====================
+      // RETURN ITEM
+      // =====================
+
+      return {
+
+        description,
+
+        quantity,
+
+        price,
+
+        taxPercent,
+
+        subtotal:
+          round(
+            itemSubtotal
+          ),
+
+        tax:
+          round(itemTax),
+
+        total:
+          round(itemTotal)
+
+      };
+    });
+
+  // =====================
+  // FINAL TOTALS
+  // =====================
+
+  subtotal =
+    round(subtotal);
+
+  totalTax =
+    round(totalTax);
+
+  const grandTotal =
+    round(
+      subtotal +
+      totalTax
+    );
+
+  // =====================
+  // RESPONSE
+  // =====================
 
   return {
-    items: processedItems,
+
+    items:
+      processedItems,
+
     subtotal,
+
     totalTax,
+
     grandTotal
+
   };
 }
 
 module.exports = {
+
   calculateInvoiceTotals
 };

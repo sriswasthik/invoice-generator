@@ -1,29 +1,159 @@
-const express = require("express");
-const cors = require("cors");
+require("dotenv").config();
 
-const invoiceRoutes = require("./routes/invoiceRoutes");
-const clientRoutes = require("./routes/clientRoutes");
-const paymentRoutes = require("./routes/paymentRoutes");
-const authRoutes = require("./routes/authRoutes");
+const express =
+  require("express");
 
-const app = express();
+const cors =
+  require("cors");
 
-// middleware
-app.use(cors());
-app.use(express.json());
+// =====================================
+// ROUTES
+// =====================================
 
-// routes
-app.use("/api/auth", authRoutes);
-app.use("/api/invoices", invoiceRoutes);
-app.use("/api/clients", clientRoutes);
-app.use("/api/payments", paymentRoutes);
+const authRoutes =
+  require("./routes/authRoutes");
 
-app.get("/", (req, res) => {
-  res.send("Invoice Platform API Running");
-});
+const clientRoutes =
+  require("./routes/clientRoutes");
 
-const PORT = process.env.PORT || 5000;
+const invoiceRoutes =
+  require("./routes/invoiceRoutes");
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const paymentRoutes =
+  require("./routes/paymentRoutes");
+
+// =====================================
+// APP
+// =====================================
+
+const app =
+  express();
+
+// =====================================
+// MIDDLEWARE
+// =====================================
+
+// CORS
+
+app.use(
+
+  cors({
+
+    origin: "*",
+
+    credentials: true
+  })
+);
+
+// JSON parser
+
+app.use(
+  express.json()
+);
+
+// =====================================
+// ROOT
+// =====================================
+
+app.get(
+  "/",
+  (req, res) => {
+
+    res.status(200).json({
+
+      message:
+        "InvoiceOS API Running"
+
+    });
+  }
+);
+
+// =====================================
+// API ROUTES
+// =====================================
+
+app.use(
+  "/api/auth",
+  authRoutes
+);
+
+app.use(
+  "/api/clients",
+  clientRoutes
+);
+
+app.use(
+  "/api/invoices",
+  invoiceRoutes
+);
+
+app.use(
+  "/api/payments",
+  paymentRoutes
+);
+
+// =====================================
+// 404 HANDLER
+// =====================================
+
+app.use(
+  "*",
+  (req, res) => {
+
+    res.status(404).json({
+
+      error:
+        "Route not found"
+
+    });
+  }
+);
+
+// =====================================
+// GLOBAL ERROR HANDLER
+// =====================================
+
+app.use(
+  (
+    err,
+    req,
+    res,
+    next
+  ) => {
+
+    console.error(
+      "SERVER ERROR:",
+      err
+    );
+
+    res.status(500).json({
+
+      error:
+        "Internal server error"
+
+    });
+  }
+);
+
+// =====================================
+// PORT
+// =====================================
+
+const PORT =
+  process.env.PORT || 5000;
+
+// =====================================
+// SERVER
+// =====================================
+
+app.listen(
+  PORT,
+  () => {
+
+    console.log(
+
+      `🚀 Server running on port ${PORT}`
+
+    );
+  }
+);

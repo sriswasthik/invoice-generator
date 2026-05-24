@@ -1,28 +1,38 @@
-const express = require("express");
+const express =
+  require("express");
 
-const router = express.Router();
+const router =
+  express.Router();
 
-const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware =
+  require(
+    "../middleware/authMiddleware"
+  );
 
 const {
+
   createClient,
+
   getClientsByUser,
+
   deleteClient
-} = require("../controllers/clientController");
 
+} = require(
+  "../controllers/clientController"
+);
 
-// =============================
-// Client Routes
-// =============================
+// =====================================
+// CLIENT ROUTES
+// =====================================
 
-// Get all clients for logged-in user
+// Get all clients
 router.get(
   "/",
   authMiddleware,
   getClientsByUser
 );
 
-// Create new client
+// Create client
 router.post(
   "/",
   authMiddleware,
@@ -36,4 +46,5 @@ router.delete(
   deleteClient
 );
 
-module.exports = router;
+module.exports =
+  router;

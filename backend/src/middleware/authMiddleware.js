@@ -1,45 +1,120 @@
-const jwt = require("jsonwebtoken");
+const jwt =
+  require("jsonwebtoken");
 
-async function authMiddleware(req, res, next) {
+// =====================================
+// AUTH MIDDLEWARE
+// =====================================
+
+async function authMiddleware(
+  req,
+  res,
+  next
+) {
 
   try {
 
-    const authHeader = req.headers.authorization;
+    // =====================
+    // GET AUTH HEADER
+    // =====================
 
-    // no token
+    const authHeader =
+      req.headers.authorization;
+
+    // =====================
+    // NO HEADER
+    // =====================
+
     if (!authHeader) {
+
       return res.status(401).json({
-        error: "Access denied. No token provided."
+
+        error:
+          "Authorization token missing"
+
       });
     }
 
-    // extract token
-    let token = authHeader;
+    // =====================
+    // EXPECT:
+    // Bearer TOKEN
+    // =====================
 
-    // handle "Bearer TOKEN"
-    if (authHeader.startsWith("Bearer ")) {
-      token = authHeader.split(" ")[1];
+    const parts =
+      authHeader.split(" ");
+
+    if (
+      parts.length !== 2 ||
+      parts[0] !== "Bearer"
+    ) {
+
+      return res.status(401).json({
+
+        error:
+          "Invalid authorization format"
+
+      });
     }
 
-    // verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    const token =
+      parts[1];
 
-    // attach user info
-    req.userId = decoded.userId;
+    // =====================
+    // VERIFY TOKEN
+    // =====================
+
+    const decoded =
+      jwt.verify(
+
+        token,
+
+        process.env.JWT_SECRET
+      );
+
+    // =====================
+    // ATTACH USER
+    // =====================
+
+    req.userId =
+      decoded.userId;
 
     next();
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "AUTH ERROR:",
+      error
+    );
+
+    // =====================
+    // TOKEN EXPIRED
+    // =====================
+
+    if (
+      error.name ===
+      "TokenExpiredError"
+    ) {
+
+      return res.status(401).json({
+
+        error:
+          "Token expired"
+
+      });
+    }
+
+    // =====================
+    // INVALID TOKEN
+    // =====================
 
     return res.status(401).json({
-      error: "Invalid or expired token"
+
+      error:
+        "Invalid token"
+
     });
   }
 }
 
-module.exports = authMiddleware;
+module.exports =
+  authMiddleware;

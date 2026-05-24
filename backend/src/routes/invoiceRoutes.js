@@ -1,21 +1,43 @@
-const express = require("express");
+const express =
+  require("express");
 
-const router = express.Router();
+const router =
+  express.Router();
 
-const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware =
+  require(
+    "../middleware/authMiddleware"
+  );
 
 const {
+
   createInvoice,
+
   getInvoicesByUser,
+
   getInvoiceDetails,
+
+  getPublicInvoice,
+
   downloadInvoicePDF
-} = require("../controllers/invoiceController");
 
+} = require(
+  "../controllers/invoiceController"
+);
 
+// =====================================
+// PUBLIC ROUTES
+// =====================================
 
-// =============================
-// Invoice Routes
-// =============================
+// Public invoice page
+router.get(
+  "/public/:id",
+  getPublicInvoice
+);
+
+// =====================================
+// PROTECTED ROUTES
+// =====================================
 
 // Create invoice
 router.post(
@@ -24,14 +46,14 @@ router.post(
   createInvoice
 );
 
-// Get all invoices for logged-in user
+// Get all invoices
 router.get(
   "/",
   authMiddleware,
   getInvoicesByUser
 );
 
-// Get single invoice details
+// Get single invoice
 router.get(
   "/:id",
   authMiddleware,
@@ -45,9 +67,5 @@ router.get(
   downloadInvoicePDF
 );
 
-router.get(
-  "/public/:id",
-  getInvoiceDetails
-);
-
-module.exports = router;
+module.exports =
+  router;
